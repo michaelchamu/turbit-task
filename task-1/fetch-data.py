@@ -10,13 +10,19 @@ load_dotenv()  # Load environment variables from .env file
 
 #fetch environment variables
 database_url = os.getenv("MONGO_URI")
+database_port = os.getenv("MONGO_PORT")
 database_username = os.getenv("MONGO_INITDB_ROOT_USERNAME")
 database_password = os.getenv("MONGO_INITDB_ROOT_PASSWORD")
 base_url = os.getenv("JSON_PLACEHOLDER")
 
 # MongoDB connection setup
-mongo_client = pymongo.MongoClient(database_url, database_username, database_password)
-db = mongo_client['users-demo']  # Change to your database name
+mongo_client = pymongo.MongoClient(
+    host=database_url,
+    port=int(database_port),
+    username=database_username,
+    password=database_password
+)
+db = mongo_client['users-demo']
 
 resource_endpoints = ['posts', 'comments', 'users']
 
