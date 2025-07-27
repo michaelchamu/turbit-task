@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI #get the FastAPI and other modules from it
 from .database import mongo_connector #import the MongoDB connection functions
-from .routes import users, posts, comments #import all defined routes
+from .routes import users, posts, comments, reports #import all defined routes
 
 app = FastAPI() #initialize the FastAPI application
 
@@ -22,6 +22,7 @@ app = FastAPI(lifespan=lifespan)  # Use the lifespan context manager
 app.include_router(users.route)
 app.include_router(posts.route)
 app.include_router(comments.route)
+app.include_router(reports.route)
 
 @app.get("/")
 async def root():
