@@ -32,3 +32,27 @@ async def get_user_reports():
         return user_reports
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+#this route fetches a report for a specific user by their ID
+@route.get("/reports/{user_id}", response_model=UserReportModel)
+async def get_user_report(user_id: int):
+    try:
+        # Fetch user, posts, and comments from the database
+        user = await mongo_connector.mongodb.db['users'].find_one({"id": user_id})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        posts = await mongo_connector.mongodb.db['posts'].find({"userId": user_id}).to_list(length=None)
+        comments = await mongo_connector.mongodb.db['comments'].find({"postId": {"$in": [post['id'] for post in posts]}}).to_list(length=None)
+        # Process and compile user report
+        report = UserReportModel(
+            id=user['id'],
+            name=user['name'],
+            username=user['username'],
+            posts=[PostSummary(**post) for post in posts],
+            comments=[CommentSummary(**comment) for comment in comments],
+            posts_count=len(posts),
+            comments_count=len(comments)
+        )
+        return report
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e)) 
