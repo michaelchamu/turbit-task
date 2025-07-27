@@ -4,3 +4,4 @@ task-1/app/.venv
 task-1/app/__pycache__/
 task-1/app/models/__pycache__/
 task-1/app/routes/__pycache__/
+task-1/app/database/__pycache__/
