@@ -1,15 +1,16 @@
+#all routes to access user data
 from fastapi import APIRouter, HTTPException
+from typing import List
+from ..database import mongo_connector
+from ..models.user import UserModel
 
 route = APIRouter()
 
-@route.get("/users")
+@route.get("/users", response_model=List[UserModel])
 async def get_users():
-    """
-    Retrieve a list of users.
-    """
     try:
-        # Simulate fetching users from a database or service
-        users = [{"id": 1, "name": "John Doe"}, {"id": 2, "name": "Jane Smith"}]
-        return {"users": users}
+        # attempt fetch users from the data database
+        users = await mongo_connector.mongodb.db['users'].find().to_list(length=None)
+        return users
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
