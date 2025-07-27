@@ -5,3 +5,4 @@ task-1/app/__pycache__/
 task-1/app/models/__pycache__/
 task-1/app/routes/__pycache__/
 task-1/app/database/__pycache__/
+task-1/app/services/__pycache__/
