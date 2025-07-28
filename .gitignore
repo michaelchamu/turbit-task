@@ -15,3 +15,11 @@ task-2/api/database/__pycache__/
 task-2/api/services/__pycache__/
 task-2/api/tests/__pycache__/
 data/csv/
+task-1/.DS_Store
+task-2/.DS_Store
+.DS_Store
+.idea/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
