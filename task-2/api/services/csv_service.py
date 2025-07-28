@@ -12,14 +12,11 @@ from typing import List, Dict
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from pathlib import Path
-from models.timeseries import TimeSeriesModel
-from fastapi import FastAPI
-from dotenv import load_dotenv
+from ..models.timeseries import TimeSeriesModel
 
-load_dotenv() 
+csv_data_path = Path(__file__).resolve().parents[3].joinpath("data/csv/")
 
 collection_name = "time-series-data"
-data_directory = os.getenv("CSV_DIRECTORY")
 
 #iterate through a selected CSV file and create a TimeSeriesModel document for each row
 def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
@@ -47,17 +44,17 @@ async def populate_time_series(db: AsyncIOMotorClient):
         if collection_name not in existing_collections or await db[collection_name].count_documents({}) == 0:
             print(f"Collection {collection_name} does not exist or is empty. Populating it from CSV files.")
             #check if the CSV directory exists
-            if not os.path.exists(data_directory):
-                raise FileNotFoundError(f"CSV directory {data_directory} does not exist.")
+            if not os.path.exists(csv_data_path):
+                raise FileNotFoundError(f"CSV directory {csv_data_path} does not exist.")
             
             #now check if there are any CSV files in the directory
-            csv_files = [f for f in os.listdir(data_directory) if f.endswith('.csv')]
+            csv_files = [f for f in os.listdir(csv_data_path) if f.endswith('.csv')]
             if not csv_files:
                 raise FileNotFoundError("No CSV files found in the directory.")
             
             #since csv_files is not empty, iterate through each file
             for csv_file in csv_files:
-                file_path = os.path.join(data_directory, csv_file)
+                file_path = os.path.join(csv_data_path, csv_file)
                 turbine_id = Path(csv_file).stem  # extract filename and remove extension to use as turbine_id
                 print(f"Processing file: {csv_file} with turbine_id: {turbine_id}")
 
@@ -74,10 +71,11 @@ async def populate_time_series(db: AsyncIOMotorClient):
                         #once batch reaches 1000 documents, insert into MongoDB and clear it
                         if len(batch) >= 1000:
                             await db[collection_name].insert_many(batch)
-                            print(f"Inserted {len(batch)} documents into {collection_name}.")
+                            #print(f"Inserted {len(batch)} documents into {collection_name}.")
                             batch.clear()
                     except Exception as e:
-                        print(f"Error processing row {row}: {e}")
+                        #print(f"Error processing row {row}: {e}")
+                        print(f"Skipping row due to error: {e}")
                         continue
                 #we are chuncking in multiples of 1000
                 #some documents may remain, so insert them here
