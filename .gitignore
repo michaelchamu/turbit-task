@@ -6,3 +6,12 @@ task-1/app/models/__pycache__/
 task-1/app/routes/__pycache__/
 task-1/app/database/__pycache__/
 task-1/app/services/__pycache__/
+task-2/.env
+task-2/api/.venv
+task-2/api/__pycache__/
+task-2/api/models/__pycache__/
+task-2/api/routes/__pycache__/
+task-2/api/database/__pycache__/
+task-2/api/services/__pycache__/
+task-2/api/tests/__pycache__/
+data/csv/
