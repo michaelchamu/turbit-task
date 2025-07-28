@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from .database import mongo_connector  # import the MongoDB connection functions
 from .services import csv_service  # import the CSV service
-from .routes import time_series  # import the time-series routes
+from .routes import timeseries  # import the time-series routes
 
 app = FastAPI()  # initialize the FastAPI application
 
@@ -16,7 +16,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)  # Use the lifespan context manager
 
-app.include_router(time_series.route)
+app.include_router(timeseries.route)
 
 @app.get("/")
 async def root():
