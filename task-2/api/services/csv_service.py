@@ -20,7 +20,9 @@ collection_name = "time-series-data"
 
 #iterate through a selected CSV file and create a TimeSeriesModel document for each row
 def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
-    timestamp = datetime.strptime(row['Dat/Zeit'], '%Y-%m-%d %H:%M:%S')
+    #here, the timestamp is in the format 'dd.mm.yyyy, HH:MM' without seconds, so
+    #we need to parse it correctly inclucing the comma
+    timestamp = datetime.strptime(row['Dat/Zeit'].strip(), '%d.%m.%Y, %H:%M')
     #to handle the case where Leistung or Wind might be empty and also 
     #to convert the comma to a dot for float conversion for consistent values
     #clean up the row data
@@ -63,6 +65,12 @@ async def populate_time_series(db: AsyncIOMotorClient):
             batch: List[Dict] = []
             with open(file_path, 'r', encoding='utf-8') as file:
                 reader = csv.DictReader(file, delimiter=';')
+
+                #fieldnames in 1st row contain spaces, so we need to strip them
+                reader.fieldnames = [field.strip() for field in reader.fieldnames]
+                #2nd data row is also part of header so skip it
+                next(reader)
+
                 for row in reader:
                     try:
                         document = parse_csv_row(row, turbine_id)
