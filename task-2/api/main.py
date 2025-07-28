@@ -1,10 +1,20 @@
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
+from fastapi.middleware.cors import CORSMiddleware
+
 from .database import mongo_connector  # import the MongoDB connection functions
 from .services import csv_service  # import the CSV service
 from .routes import timeseries  # import the time-series routes
 
 app = FastAPI()  # initialize the FastAPI application
+
+# Configure CORS middleware to allow requests from the React App and other origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["GET"]#since we are only fetching data, allow only GET requests
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
