@@ -11,12 +11,21 @@ type SidebarProps = {
 
 
 const Sidebar = ({ onFilterChange }: SidebarProps) => {
-    const [turbineId, setTurbineId] = useState("");
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
+    const [turbineId, setTurbineId] = useState("Turbine2"); //by default always use Turbine1
+    const [startDate, setStartDate] = useState("2016-01-01T00:00:00");
+    const [endDate, setEndDate] = useState("2016-01-10T00:00:00");
 
     const handleApply = () => {
-        onFilterChange({ turbineId, startDate, endDate });
+        if (!startDate || !endDate)
+            return;
+        const formattedStartDate = new Date(startDate).toISOString().slice(0, 19);
+        const formattedEndDate = new Date(endDate).toISOString().slice(0, 19);
+
+        onFilterChange({
+            turbineId,
+            startDate: formattedStartDate,
+            endDate: formattedEndDate
+        });
     }
     return (
         <div className="bg-white shadow rounded-lg p-4 space-y-4">
