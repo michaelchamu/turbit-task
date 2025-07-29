@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type SidebarProps = {
     // Props for filter logic if needed
@@ -22,6 +22,11 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
         "Turbine3",
         "Turbine4"
     ];
+
+    useEffect(() => {
+        handleApply();
+    }, []);
+
     const handleApply = () => {
         if (!startDate || !endDate)
             return;
