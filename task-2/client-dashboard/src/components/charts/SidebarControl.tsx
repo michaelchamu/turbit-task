@@ -62,22 +62,28 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
             </div>
 
             <div>
-                <label className="block text-sm font-medium">Start Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Start Date
+                </label>
                 <input
                     type="date"
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
+                    max={endDate} // Prevent start date after end date
                 />
             </div>
 
             <div>
-                <label className="block text-sm font-medium">End Date</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    End Date
+                </label>
                 <input
                     type="date"
-                    className="w-full border rounded px-2 py-1"
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
+                    min={startDate} // Prevent end date before start date
                 />
             </div>
 
