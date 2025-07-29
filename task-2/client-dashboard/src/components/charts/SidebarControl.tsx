@@ -15,6 +15,13 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
     const [startDate, setStartDate] = useState("2016-01-01T00:00:00");
     const [endDate, setEndDate] = useState("2016-01-10T00:00:00");
 
+    //fix this to pull Turbine list from API
+    const turbineOptions = [
+        "Turbine1",
+        "Turbine2",
+        "Turbine3",
+        "Turbine4"
+    ];
     const handleApply = () => {
         if (!startDate || !endDate)
             return;
