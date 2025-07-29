@@ -1,17 +1,67 @@
-type TimeseriesChartProps = {
+import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Brush,
+  Legend,
+  Label
+} from "recharts";
+
+//import data fetching service and interfaces
+import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/apiService";
+
+type TimeSeriesChartProps = {
   // Add props here later, e.g., data, selectedTurbine, etc.
+  turbineId?: string;
+  startDate?: string;
+  endDate?: string;
 };
 
-function TimeseriesChart({ }: TimeseriesChartProps) {
+const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps) => {
+  const [data, setData] = useState<TimeSeriesDataPoint[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const fetchedData = await fetchTimeSeriesData({
+          turbine_id: turbineId,
+          start_date: startDate,
+          end_date: endDate,
+          limit: 1000 // Adjust limit as needed
+        });
+        setData(fetchedData);
+      } catch (error) {
+        console.error("Failed to fetch time series data:", error);
+      }
+    };
+    load();
+  }, [turbineId, startDate, endDate]);
+
   return (
-    <div className="bg-white shadow-md rounded-xl p-4 w-full h-full">
-      <h2 className="text-xl font-semibold mb-4">Power Generation Over Wind Speed chart</h2>
-      {/* Chart will go here */}
-      <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
-        [Chart Placeholder]
-      </div>
+    <div className="w-full">
+      <h2 className="text-xl font-semibold mb-4">Power vs Wind Speed</h2>
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+          <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
+          <XAxis dataKey="wind_speed" type="number">
+            <Label value="Wind Speed (m/s)" offset={-40} position="insideBottom" />
+          </XAxis>
+          <YAxis domain={[0, "auto"]}>
+            <Label value="Power (W)" angle={-90} position="insideLeft" />
+          </YAxis>
+          <Tooltip />
+          <Legend verticalAlign="top" height={36} />
+          <Brush dataKey="wind_speed" height={30} stroke="#8884d8" />
+          <Line type="monotone" dataKey="power" stroke="#8884d8" dot={false} name="Power Output" />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
-}
+};
 
-export default TimeseriesChart;
+export default TimeSeriesChart;
