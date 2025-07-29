@@ -15,7 +15,7 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
     const [startDate, setStartDate] = useState("2016-01-01T00:00:00");
     const [endDate, setEndDate] = useState("2016-01-10T00:00:00");
 
-    //fix this to pull Turbine list from API
+    //TODO fix this to pull Turbine list from API
     const turbineOptions = [
         "Turbine1",
         "Turbine2",
@@ -30,6 +30,7 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
     const handleApply = () => {
         if (!startDate || !endDate)
             return;
+        //todo ensure startdate is alwys before enddate
         const formattedStartDate = new Date(startDate).toISOString().slice(0, 19);
         const formattedEndDate = new Date(endDate).toISOString().slice(0, 19);
 
@@ -44,13 +45,20 @@ const Sidebar = ({ onFilterChange }: SidebarProps) => {
             <h2 className="text-lg font-semibold">Filters</h2>
 
             <div>
-                <label className="block text-sm font-medium">Turbine ID</label>
-                <input
-                    type="text"
-                    className="w-full border rounded px-2 py-1"
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Turbine ID
+                </label>
+                <select
+                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     value={turbineId}
                     onChange={(e) => setTurbineId(e.target.value)}
-                />
+                >
+                    {turbineOptions.map((turbine) => (
+                        <option key={turbine} value={turbine}>
+                            {turbine}
+                        </option>
+                    ))}
+                </select>
             </div>
 
             <div>
