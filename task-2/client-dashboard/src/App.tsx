@@ -1,12 +1,21 @@
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import Sidebar from './components/charts/SidebarControl';
+import TimeseriesChart from './components/charts/TimeSeriesChart';
 
 function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto px-4 py-6">
-        This is the main content area.
+        <div className='grid grid-cols-1 lg:grid-cols-12 gab-6'>
+          <div className='lg:col-span-3'>
+            <Sidebar />
+          </div>
+          <div className='lg:col-span-9'>
+            <TimeseriesChart />
+          </div>
+        </div>
       </main>
       <Footer />
     </div>
