@@ -30,7 +30,7 @@ async def get_time_series_data(
             query['timestamp'] = {'$gte': start_date}
         elif end_date:
             query['timestamp'] = {'$lte': end_date}
-
+        #this adjustment allows for more flexible querying using a cursor from MongoDB
         cursor = mongo_connector.mongodb.db['time-series-data'].find(query).sort('timestamp', ASCENDING).limit(limit)
         results = await cursor.to_list(length=limit)
 
