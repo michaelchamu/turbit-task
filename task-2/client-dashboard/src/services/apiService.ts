@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
 
-export interface TimeSeriesData {
+export interface TimeSeriesDataPoint {
     timestamp: string;
     power: number;
     wind_speed: number;
@@ -20,9 +20,9 @@ interface QueryParameters {
 
 export const fetchTimeSeriesData = async (
     params?: QueryParameters
-): Promise<TimeSeriesData[]> => {
+): Promise<TimeSeriesDataPoint[]> => {
     try {
-        const response = await axios.get<TimeSeriesData[]>(`${API_ENDPOINT}/timeseries`, {
+        const response = await axios.get<TimeSeriesDataPoint[]>(`${API_ENDPOINT}/timeseries`, {
             params,
         });
         return response.data;
