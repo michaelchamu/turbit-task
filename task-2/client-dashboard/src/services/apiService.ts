@@ -23,7 +23,7 @@ export const fetchTimeSeriesData = async (
 ): Promise<TimeSeriesDataPoint[]> => {
     try {
         const response = await axios.get<TimeSeriesDataPoint[]>(`${API_ENDPOINT}/timeseries`, {
-            params,
+            params
         });
         return response.data;
     } catch (error) {
