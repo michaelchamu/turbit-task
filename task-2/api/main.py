@@ -6,15 +6,11 @@ from .database import mongo_connector  # import the MongoDB connection functions
 from .services import csv_service  # import the CSV service
 from .routes import timeseries  # import the time-series routes
 
-app = FastAPI()  # initialize the FastAPI application
-
 # Configure CORS middleware to allow requests from the React App and other origins
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # React App origins
-    allow_credentials=True,
-    allow_methods=["GET"]#since we are only fetching data, allow only GET requests
-)
+origins = ["http://localhost:3000",
+           "http://localhost:5173",
+           "http://127.0.0.1:5173", 
+           ]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -26,6 +22,16 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)  # Use the lifespan context manager
 
+#add CORS middleware here to allow cross-origin requests
+#if added at the top, it will be overwritten and will cause CORS issues
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= origins,  # React App origins
+    allow_credentials=True,
+    allow_methods=["GET"],#since we are only fetching data, allow only GET requests
+    allow_headers=["*"],
+    expose_headers=["*"],  # to allow downloading files
+)
 app.include_router(timeseries.route)
 
 @app.get("/")
