@@ -7,7 +7,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Brush,
   Legend,
   Label
 } from "recharts";
@@ -41,6 +40,8 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
     };
     load();
   }, [turbineId, startDate, endDate]);
+  const maxWindSpeed = Math.max(...data.map(d => d.average_wind_speed));
+  const maxPower = Math.max(...data.map(d => d.average_power));
 
   return (
     <div className="w-full">
@@ -48,10 +49,10 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-          <XAxis dataKey="average_wind_speed" type="number" domain={[0, 30]}>
+          <XAxis dataKey="average_wind_speed" type="number" domain={[0, maxWindSpeed]}>
             <Label value="Wind Speed (m/s)" offset={0} position="insideBottom" />
           </XAxis>
-          <YAxis dataKey="average_power" type="number" domain={[0, 30]}>
+          <YAxis dataKey="average_power" type="number" domain={[0, maxPower]}>
             <Label value="Power kW" offset={0} position="left" />
           </YAxis>
           <Tooltip />
