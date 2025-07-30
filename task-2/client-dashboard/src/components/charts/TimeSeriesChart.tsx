@@ -50,7 +50,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   const avgExternalTemperature = data.reduce((acc, item) => acc + item.average_external_temperature, 0) / data.length;
   const avgInternalTemperature = data.reduce((acc, item) => acc + item.average_internal_temperature, 0) / data.length;
   const avgRPM = data.reduce((acc, item) => acc + item.average_rpm, 0) / data.length;
-
+  //const formattedStartDate = new Date(startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
   return (
     <div className="w-full">
@@ -59,8 +59,22 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
         {/* Date Range Info */}
         {startDate && endDate && (
           <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
-            <div>Selected range: {Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24))} days</div>
-            <div> Timeframe |  {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()} </div>
+            <div>Selected range: {Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24))} days,&nbsp;
+
+              {new Date(startDate).toLocaleDateString("en-US",
+                {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric"
+                })} -
+
+              {new Date(endDate).toLocaleDateString("en-US",
+                {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric"
+                })}
+            </div>
           </div>
 
         )}
@@ -83,7 +97,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Max Wind Speed</div>
-          <div className="text-lg font-semibold">{maxWindSpeed.toFixed(0)}</div>
+          <div className="text-lg font-semibold">{maxWindSpeed.toFixed(0)} m/s</div>
         </div>
       </div>
       <br />
@@ -105,22 +119,22 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           <div className="text-lg font-semibold">{avgRPM.toFixed(1)} rpm</div>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={550}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
           <XAxis
             type="number"
             dataKey="average_wind_speed"
-            domain={[0, 20]}
+            domain={[0, 21]}
+            tickCount={10}
             label={{ value: 'Average Wind Speed (m/s)', offset: - 5, position: 'insideBottom' }}
           />
 
           <YAxis
             type="number"
             dataKey="average_power"
-            domain={[0, maxPower]}
-
-            label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft' }}
+            domain={[0, Math.ceil(maxPower / 100) * 100]}
+            label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft', style: { textAnchor: 'middle' } }}
           />
 
           <Tooltip />
