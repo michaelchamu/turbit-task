@@ -12,7 +12,7 @@ from typing import List, Dict
 from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from pathlib import Path
-from ..models.timeseries import TimeSeriesModel
+from ..models.timeseries import TimeSeriesModel, TurbineMetadata
 
 csv_data_path = Path(__file__).resolve().parents[3].joinpath("data/csv/")
 
@@ -28,24 +28,60 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
     #clean up the row data
     power = float(row['Leistung'].replace(',', '.')) if row['Leistung'] else 0.0
     wind_speed = float(row['Wind'].replace(',', '.')) if row['Wind'] else None
+    #csv files do not have longitude and latitude, so this is handled here
+    #this is a scalability adjustment to allow it to work with a CSV file that has location data
+
+    latitude = row.get('Latitude')
+    longitude = row.get('Longitude')
+    altitude = row.get('Altitude')
 
     return TimeSeriesModel(
         timestamp=timestamp,
         power=power,
         wind_speed=wind_speed,
-        turbine_id=turbine_id
+        metadata=TurbineMetadata(
+            turbine_id=turbine_id,
+            latitude=float(latitude.replace(',', '.')) if latitude else None,
+            longitude=float(longitude.replace(',', '.')) if longitude else None,
+            altitude=float(altitude.replace(',', '.')) if longitude else None
+        )
         ).model_dump()  
+
+#method to create the time-series collection if it does not exist
+async def create_time_series_collection(db: AsyncIOMotorClient):
+    try:
+        existing_collections = await db.list_collection_names()
+
+        if collection_name not in existing_collections:
+            #create the time-series collection with the specified options
+            await db.create_collection(
+                collection_name,
+                timeseries={
+                    'timeField': 'timestamp',
+                    'metaField': 'metadata',
+                    'granularity': 'minutes'
+                }
+            )
+            print(f"Time-series collection '{collection_name}' created successfully.")
+        else:
+            print(f"Time-series collection '{collection_name}' already exists.")
+    except Exception as e:
+        print(f"An error occurred while creating the time-series collection: {e}")
+        raise e
+    
 
 #actual service to read CSVs then call parse_csv_row for each row and insert into MongoDB
 async def populate_time_series(db: AsyncIOMotorClient):
     try:
-        #retrieve collections from named database
-        existing_collections = await db.list_collection_names()
+        #ensure that the timeseries colection exists by calling the createtimeseries_collection method
+        await create_time_series_collection(db)
 
-        #check if the time-series collection exists and is not empty
-        if collection_name not in existing_collections or await db[collection_name].count_documents({}) == 0:
-            print(f"Collection {collection_name} does not exist or is empty. Populating it from CSV files.")
-            #check if the CSV directory exists
+        #now check if the timeseries collection exists is empty
+        document_count = await db[collection_name].count_documents({})
+
+        if document_count == 0:
+            print(f"Collection {collection_name} is empty. Populating it from CSV files.")
+            #check if the CSV data directory exists
             if not os.path.exists(csv_data_path):
                 raise FileNotFoundError(f"CSV directory {csv_data_path} does not exist.")
             
@@ -82,7 +118,6 @@ async def populate_time_series(db: AsyncIOMotorClient):
                             #print(f"Inserted {len(batch)} documents into {collection_name}.")
                             batch.clear()
                     except Exception as e:
-                        #print(f"Error processing row {row}: {e}")
                         print(f"Skipping row due to error: {e}")
                         continue
                 #we are chuncking in multiples of 1000
