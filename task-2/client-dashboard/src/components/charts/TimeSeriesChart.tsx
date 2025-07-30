@@ -40,21 +40,69 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
     };
     load();
   }, [turbineId, startDate, endDate]);
+
+  // get statistical summaries
   const maxWindSpeed = Math.max(...data.map(d => d.average_wind_speed));
   const maxPower = Math.max(...data.map(d => d.average_power));
+  const avgPower = data.reduce((acc, item) => acc + item.average_power, 0) / data.length;
+  const avgWindSpeed = data.reduce((acc, item) => acc + item.average_wind_speed, 0) / data.length;
+
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-4">Power vs Wind Speed</h2>
+      <h2 className="text-xl font-semibold mb-4">Power Curve Summary</h2>
+      <p className="text-sm text-gray-600">
+        Power Generation for {turbineId}
+      </p>
+      <p className="text-sm text-gray-600">
+        {/* Date Range Info */}
+        {startDate && endDate && (
+          <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+            <div>Selected range: {Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24))} days</div>
+            <div> Timeframe |  {new Date(startDate).toLocaleDateString()} - {new Date(endDate).toLocaleDateString()} </div>
+          </div>
+
+        )}
+
+      </p>
+      {/* Statistics */}
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg Power</div>
+          <div className="text-lg font-semibold">{avgPower.toFixed(0)} kW</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Max Power</div>
+          <div className="text-lg font-semibold">{maxPower.toFixed(0)} kW</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg Wind Speed</div>
+          <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sam">
+          <div className="text-sm text-gray-600">Data Points</div>
+          <div className="text-lg font-semibold">{data.length.toLocaleString()}</div>
+        </div>
+      </div>
+
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-          <XAxis dataKey="average_wind_speed" type="number" domain={[0, maxWindSpeed]}>
-            <Label value="Wind Speed (m/s)" offset={0} position="insideBottom" />
-          </XAxis>
-          <YAxis dataKey="average_power" type="number" domain={[0, maxPower]}>
-            <Label value="Power kW" offset={0} position="left" />
-          </YAxis>
+          <XAxis
+            type="number"
+            dataKey="average_wind_speed"
+            domain={[0, maxWindSpeed]}
+            label={{ value: 'Wind Speed (m/s)', offset: - 10, position: 'insideBottom' }}
+          />
+
+          <YAxis
+            type="number"
+            dataKey="average_power"
+            domain={[0, maxPower]}
+            label={{ value: 'Power (kW)', angle: -90, position: 'insideLeft' }}
+          />
+
           <Tooltip />
           <Legend verticalAlign="top" height={36} />
           <Line type="monotone" dataKey="average_power" stroke="#8884d8" name="Power Output" />
