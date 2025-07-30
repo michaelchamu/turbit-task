@@ -7,8 +7,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
-  Label
+  Legend
 } from "recharts";
 
 //import data fetching service and interfaces
@@ -46,15 +45,17 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   const maxPower = Math.max(...data.map(d => d.average_power));
   const avgPower = data.reduce((acc, item) => acc + item.average_power, 0) / data.length;
   const avgWindSpeed = data.reduce((acc, item) => acc + item.average_wind_speed, 0) / data.length;
+  const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum'] // pick a random location name where the turbine is located
+  const avgAzimuth = data.reduce((acc, item) => acc + item.average_azimuth, 0) / data.length;
+  const avgExternalTemperature = data.reduce((acc, item) => acc + item.average_external_temperature, 0) / data.length;
+  const avgInternalTemperature = data.reduce((acc, item) => acc + item.average_internal_temperature, 0) / data.length;
+  const avgRPM = data.reduce((acc, item) => acc + item.average_rpm, 0) / data.length;
 
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-4">Power Curve Summary</h2>
-      <p className="text-sm text-gray-600">
-        Power Generation for {turbineId}
-      </p>
-      <p className="text-sm text-gray-600">
+      <h2 className="text-xl font-semibold mb-4">Power Curve Summary for {turbineId} Located at {locationNames[Math.floor(Math.random() * 4)]}</h2>
+      <div className="text-sm text-gray-600">
         {/* Date Range Info */}
         {startDate && endDate && (
           <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
@@ -64,7 +65,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
 
         )}
 
-      </p>
+      </div>
       {/* Statistics */}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -81,27 +82,27 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
-          <div className="text-sm text-gray-600">Data Points</div>
-          <div className="text-lg font-semibold">{data.length.toLocaleString()}</div>
+          <div className="text-sm text-gray-600">Max Wind Speed</div>
+          <div className="text-lg font-semibold">{maxWindSpeed.toFixed(0)}</div>
         </div>
       </div>
       <br />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Azimuth</div>
-          <div className="text-lg font-semibold">{avgPower.toFixed(0)} kW</div>
+          <div className="text-lg font-semibold">{avgAzimuth.toFixed(0)} &deg;</div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg External Temp</div>
-          <div className="text-lg font-semibold">{maxPower.toFixed(0)} kW</div>
+          <div className="text-lg font-semibold">{avgExternalTemperature.toFixed(1)} &deg; C</div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Internal Temp</div>
-          <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
+          <div className="text-lg font-semibold">{avgInternalTemperature.toFixed(1)} &deg; C</div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Rotor Speed</div>
-          <div className="text-lg font-semibold">{data.length.toLocaleString()}</div>
+          <div className="text-lg font-semibold">{avgRPM.toFixed(1)} rpm</div>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={400}>
