@@ -96,38 +96,38 @@ async def populate_time_series(db: AsyncIOMotorClient):
                 turbine_id = Path(csv_file).stem  # extract filename and remove extension to use as turbine_id
                 print(f"Processing file: {csv_file} with turbine_id: {turbine_id}")
 
-            #Files have more than 10k lines, so to be safe with memory issues, perfomance
-            #and mongo batch insert, read the data in chunks
-            batch: List[Dict] = []
-            with open(file_path, 'r', encoding='utf-8') as file:
-                reader = csv.DictReader(file, delimiter=';')
+                #Files have more than 10k lines, so to be safe with memory issues, perfomance
+                #and mongo batch insert, read the data in chunks
+                batch: List[Dict] = []
+                with open(file_path, 'r', encoding='utf-8') as file:
+                    reader = csv.DictReader(file, delimiter=';')
 
-                #fieldnames in 1st row contain spaces, so we need to strip them
-                reader.fieldnames = [field.strip() for field in reader.fieldnames]
-                #2nd data row is also part of header so skip it
-                next(reader)
+                    #fieldnames in 1st row contain spaces, so we need to strip them
+                    reader.fieldnames = [field.strip() for field in reader.fieldnames]
+                    #2nd data row is also part of header so skip it
+                    next(reader)
 
-                for row in reader:
-                    try:
-                        document = parse_csv_row(row, turbine_id)
-                        batch.append(document)
+                    for row in reader:
+                        try:
+                            document = parse_csv_row(row, turbine_id)
+                            batch.append(document)
 
-                        #once batch reaches 1000 documents, insert into MongoDB and clear it
-                        if len(batch) >= 1000:
-                            await db[collection_name].insert_many(batch)
-                            #print(f"Inserted {len(batch)} documents into {collection_name}.")
-                            batch.clear()
-                    except Exception as e:
-                        print(f"Skipping row due to error: {e}")
-                        continue
-                #we are chuncking in multiples of 1000
-                #some documents may remain, so insert them here
-                if batch:
-                    await db[collection_name].insert_many(batch)
-                    print(f"Inserted remaining {len(batch)} documents into {collection_name}.")
+                            #once batch reaches 1000 documents, insert into MongoDB and clear it
+                            if len(batch) >= 1000:
+                                await db[collection_name].insert_many(batch)
+                                #print(f"Inserted {len(batch)} documents into {collection_name}.")
+                                batch.clear()
+                        except Exception as e:
+                            print(f"Skipping row due to error: {e}")
+                            continue
+                    #we are chuncking in multiples of 1000
+                    #some documents may remain, so insert them here
+                    if batch:
+                        await db[collection_name].insert_many(batch)
+                        print(f"Inserted remaining {len(batch)} documents into {collection_name}.")
 
-            print(f"Populated {collection_name} collection with data from {len(csv_files)} CSV files.")
-        else:
-            print(f"{collection_name} collection already exists and is not empty. No action taken.")
+                print(f"Populated {collection_name} collection with data from {len(csv_files)} CSV files.")
+            else:
+                print(f"{collection_name} collection already exists and is not empty. No action taken.")
     except Exception as e:
         print(f"An error occurred while populating the time-series data: {e}")
