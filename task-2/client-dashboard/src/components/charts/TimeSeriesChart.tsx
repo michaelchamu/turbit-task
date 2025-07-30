@@ -80,27 +80,46 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           <div className="text-sm text-gray-600">Avg Wind Speed</div>
           <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sam">
+        <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Data Points</div>
           <div className="text-lg font-semibold">{data.length.toLocaleString()}</div>
         </div>
       </div>
-
+      <br />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg Azimuth</div>
+          <div className="text-lg font-semibold">{avgPower.toFixed(0)} kW</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg External Temp</div>
+          <div className="text-lg font-semibold">{maxPower.toFixed(0)} kW</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg Internal Temp</div>
+          <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
+        </div>
+        <div className="bg-white p-3 rounded-lg shadow-sm">
+          <div className="text-sm text-gray-600">Avg Rotor Speed</div>
+          <div className="text-lg font-semibold">{data.length.toLocaleString()}</div>
+        </div>
+      </div>
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
           <XAxis
             type="number"
             dataKey="average_wind_speed"
-            domain={[0, maxWindSpeed]}
-            label={{ value: 'Wind Speed (m/s)', offset: - 10, position: 'insideBottom' }}
+            domain={[0, 20]}
+            label={{ value: 'Average Wind Speed (m/s)', offset: - 5, position: 'insideBottom' }}
           />
 
           <YAxis
             type="number"
             dataKey="average_power"
             domain={[0, maxPower]}
-            label={{ value: 'Power (kW)', angle: -90, position: 'insideLeft' }}
+
+            label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft' }}
           />
 
           <Tooltip />
