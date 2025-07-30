@@ -20,3 +20,6 @@ class TimeSeriesModel(BaseModel):
 class AggregatedTimeSeriesModel(BaseModel):
     average_power: float = Field(..., description="Average power production in watts")
     average_wind_speed: float = Field(..., description="Average wind speed in m/s")
+    average_azimuth: float = Field(..., description="Average azimuth angle")
+    average_external_temperature: float = Field(..., description="Average external temps")
+    averate_internal_temperature: float = Field(..., description="Average internal temps")
