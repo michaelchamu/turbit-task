@@ -28,6 +28,10 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
     #clean up the row data
     power = float(row['Leistung'].replace(',', '.')) if row['Leistung'] else 0.0
     wind_speed = float(row['Wind'].replace(',', '.')) if row['Wind'] else None
+    azimuth = float(row['Azimut'].replace(',', '.')) if row['Azimut'] else 0.0
+    external_temperature = float(row['Leistung'].replace(',', '.')) if row['Leistung'] else 0.0
+    internal_temperature = float(row['Lager'].replace(',', '.')) if row['Lager'] else 0.0
+    rpm = float(row['Rotor'].replace(',', '.')) if row['Rotor'] else 0.0
     #csv files do not have longitude and latitude, so this is handled here
     #this is a scalability adjustment to allow it to work with a CSV file that has location data
 
@@ -43,7 +47,11 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
             turbine_id=turbine_id,
             latitude=float(latitude.replace(',', '.')) if latitude else None,
             longitude=float(longitude.replace(',', '.')) if longitude else None,
-            altitude=float(altitude.replace(',', '.')) if longitude else None
+            altitude=float(altitude.replace(',', '.')) if longitude else None,
+            azimuth=azimuth,
+            external_temperature=external_temperature,
+            internal_temperature=internal_temperature,
+            rpm=rpm
         )
         ).model_dump()  
 
