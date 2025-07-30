@@ -5,6 +5,10 @@ const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
 export interface TimeSeriesDataPoint {
     average_wind_speed: number;
     average_power: number;
+    average_azimuth: number;
+    average_external_temperature: number;
+    average_internal_temperature: number;
+    average_rpm: number;
 }
 
 interface QueryParameters {
