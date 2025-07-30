@@ -32,7 +32,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           turbine_id: turbineId,
           start_date: startDate,
           end_date: endDate,
-          limit: 1000 // Adjust limit as needed
+          // limit: 1000 // Adjust limit as needed
         });
         setData(fetchedData);
       } catch (error) {
@@ -48,16 +48,16 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
           <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-          <XAxis dataKey="wind_speed" type="number">
-            <Label value="Wind Speed (m/s)" offset={-40} position="insideBottom" />
+          <XAxis dataKey="average_wind_speed" type="number" domain={[0, 30]}>
+            <Label value="Wind Speed (m/s)" offset={0} position="insideBottom" />
           </XAxis>
-          <YAxis domain={[0, "auto"]}>
-            <Label value="Power (W)" angle={-90} position="insideLeft" />
+          <YAxis dataKey="average_power" type="number" domain={[0, 30]}>
+            <Label value="Power kW" offset={0} position="left" />
           </YAxis>
           <Tooltip />
           <Legend verticalAlign="top" height={36} />
-          <Brush dataKey="wind_speed" height={30} stroke="#8884d8" />
-          <Line type="monotone" dataKey="power" stroke="#8884d8" dot={false} name="Power Output" />
+          <Line type="monotone" dataKey="average_power" stroke="#8884d8" name="Power Output" />
+
         </LineChart>
       </ResponsiveContainer>
     </div>
