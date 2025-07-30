@@ -44,19 +44,21 @@ async def get_time_series_data(
 #I have skipped including the date in the model, as the dates are only passed for querying
 @route.get("/aggregated_timeseries", response_model=List[AggregatedTimeSeriesModel])
 async def get_power_curve(
-    start_date: Optional[str] = Query(None, description="Start date in YYYY-MM-DD"),
-    end_date: Optional[str] = Query(None, description="End date in YYYY-MM-DD"),
+    start_date: Optional[datetime] = Query(None, description="Start date in YYYY-MM-DD"),
+    end_date: Optional[datetime] = Query(None, description="End date in YYYY-MM-DD"),
     turbine_id: Optional[str] = None
 ):
    #by default, the start date is set to 01.01.2016 and the end date to 02.01.2016
-    default_start = datetime.strptime('01.01.2016, 00:00', '%d.%m.%Y, %H:%M')
-    default_end = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
+   # default_start = datetime.strptime('01.01.2016, 00:00', '%d.%m.%Y, %H:%M')
+   # default_end = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
 
     try:
-        start_dt = datetime.strptime(start_date, "%d.%m.%Y, %H:%M") if start_date else default_start
-        end_dt = datetime.strptime(end_date, "%d.%m.%Y, %H:%M") + timedelta(days=1) if end_date else default_end
-
-        if start_dt >= end_dt:
+        #check if start_date and end_date exist.
+        #if dates dont exist i.e. its an API only call, set them to default values
+        if not start_date or not end_date:
+            start_date = datetime.strptime('01.01.2016, 00:00', '%d.%m.%Y, %H:%M')
+            end_date = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
+        if start_date >= end_date:
             raise ValueError("start_date must be earlier than end_date.")
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
@@ -68,7 +70,7 @@ async def get_power_curve(
     boundaries = [round(min_wind + i * bin_size, 2) for i in range(int((max_wind - min_wind) / bin_size) + 1)]
     boundaries.append(max_wind + bin_size)
 
-    match_stage = {"timestamp": {"$gte": start_dt, "$lt": end_dt}}
+    match_stage = {"timestamp": {"$gte": start_date, "$lt": end_date}}
     if turbine_id:
         match_stage["metadata.turbine_id"] = turbine_id
 
@@ -82,6 +84,10 @@ async def get_power_curve(
                 "output": {
                     "average_power": {"$avg": "$power"},
                     "avg_wind_speed": {"$avg": "$wind_speed"},
+                    "avg_azimuth": {"$avg": "$metadata.azimuth"},
+                    "average_external_temperature": {"$avg": "$metadata.external_temperature" },
+                    "average_internal_temperature": {"$avg": "$metadata.internal_temperature"},
+                    "average_rpm": {"$avg": "$metadata.rpm"},
                     "count": {"$sum": 1}
                 }
             }
@@ -94,6 +100,10 @@ async def get_power_curve(
     async for doc in mongo_connector.mongodb.db['time-series-data'].aggregate(pipeline):
         results.append(AggregatedTimeSeriesModel(
             average_wind_speed=round(doc["avg_wind_speed"], 2),
-            average_power=round(doc["average_power"], 2)
+            average_power=round(doc["average_power"], 2),
+            average_azimuth=round(doc["avg_azimuth"], 2),
+            average_external_temperature=round(doc["average_external_temperature"]),
+            average_internal_temperature=round(doc["average_internal_temperature"]),
+            average_rpm = round(doc["average_rpm"])
         ))
     return results

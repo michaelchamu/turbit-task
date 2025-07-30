@@ -22,5 +22,6 @@ class AggregatedTimeSeriesModel(BaseModel):
     average_wind_speed: float = Field(..., description="Average wind speed in m/s")
     average_azimuth: float = Field(..., description="Average azimuth angle")
     average_external_temperature: float = Field(..., description="Average external temps")
-    averate_internal_temperature: float = Field(..., description="Average internal temps")
-    azimuth: float = Field(..., description="Degrees or angles the direction in which points the rotor hub or a spinner of the turbine")
+    average_internal_temperature: float = Field(..., description="Average internal temps")
+    average_rpm: float = Field(..., description="Average rotation speed")
+    average_azimuth: float = Field(..., description="Degrees or angles the direction in which points the rotor hub or a spinner of the turbine")
