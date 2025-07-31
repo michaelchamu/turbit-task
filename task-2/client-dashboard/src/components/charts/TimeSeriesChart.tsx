@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
-import { MdOutlineWindPower } from "react-icons/md"
+import { MdOutlineWindPower, MdBolt } from "react-icons/md"
 //import data fetching service and interfaces
 import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/apiService";
 
@@ -103,9 +103,10 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       {/* Statistics */}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-3 rounded-lg shadow-sm flex items-center gap-3">
+
+        <div className="bg-yellow-100 p-3 rounded-lg shadow-sm flex items-center gap-3">
           <div className="bg-yellow-100 text-yellow-600 rounded-full p-2">
-            <MdOutlineWindPower className="w-5 h-5" />
+            <MdBolt className="w-5 h-5" />
           </div>
           <div>
             <div className="text-sm text-gray-600">Avg Power</div>
@@ -114,34 +115,35 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
             </div>
           </div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+
+        <div className="bg-amber-400 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Max Power</div>
           <div className="text-lg font-semibold">{maxPower.toFixed(0)} kW</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-blue-200 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Wind Speed</div>
           <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-blue-300 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Max Wind Speed</div>
           <div className="text-lg font-semibold">{maxWindSpeed.toFixed(0)} m/s</div>
         </div>
       </div>
       <br />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-green-200 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Azimuth</div>
           <div className="text-lg font-semibold">{avgAzimuth.toFixed(0)} &deg;</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-red-200 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg External Temp</div>
           <div className="text-lg font-semibold">{avgExternalTemperature.toFixed(1)} &deg; C</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-cyan-500 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Internal Temp</div>
           <div className="text-lg font-semibold">{avgInternalTemperature.toFixed(1)} &deg; C</div>
         </div>
-        <div className="bg-white p-3 rounded-lg shadow-sm">
+        <div className="bg-purple-200 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Rotor Speed</div>
           <div className="text-lg font-semibold">{avgRPM.toFixed(1)} rpm</div>
         </div>
