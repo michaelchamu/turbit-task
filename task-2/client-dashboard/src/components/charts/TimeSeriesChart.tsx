@@ -106,8 +106,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       </div>
       {/* Statistics */}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 ">
         <div className="bg-yellow-100 p-3 rounded-lg shadow-sm flex items-center gap-3">
           <div className="bg-yellow-100 text-yellow-600 rounded-full p-2">
             <MdBolt className="w-5 h-5" />
@@ -176,31 +175,34 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           <div className="text-lg font-semibold">{avgRPM.toFixed(1)} rpm</div>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={550}>
-        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
-          <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
-          <XAxis
-            type="number"
-            dataKey="average_wind_speed"
-            domain={[0, 21]}
-            tickCount={10}
-            label={{ value: 'Average Wind Speed (m/s)', offset: - 5, position: 'insideBottom' }}
-          />
 
-          <YAxis
-            type="number"
-            dataKey="average_power"
-            domain={[0, Math.ceil(maxPower / 100) * 100]}
-            label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft', style: { textAnchor: 'middle' } }}
-          />
+      <div className="shadow-2xl rounded-lg border border-gray-200 bg-white p-4 flex items-center mt-4">
+        <ResponsiveContainer width="100%" height={550}>
+          <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
+            <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
+            <XAxis
+              type="number"
+              dataKey="average_wind_speed"
+              domain={[0, 21]}
+              tickCount={10}
+              label={{ value: 'Average Wind Speed (m/s)', offset: - 5, position: 'insideBottom' }}
+            />
 
-          <Tooltip />
-          <Legend verticalAlign="top" height={36} />
-          <Line type="monotone" dataKey="average_power" stroke="#8884d8" name="Power Output" />
+            <YAxis
+              type="number"
+              dataKey="average_power"
+              domain={[0, Math.ceil(maxPower / 100) * 100]}
+              label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+            />
 
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+            <Tooltip />
+            <Legend verticalAlign="top" height={36} />
+            <Line type="monotone" dataKey="average_power" stroke="#8884d8" name="Power Output" />
+
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div >
   );
 };
 
