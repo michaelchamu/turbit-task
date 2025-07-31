@@ -1,5 +1,6 @@
 // Sidebar.tsx
 import { useState, useEffect } from "react";
+import { fetchTurbineList } from "../../services/apiService";
 
 type SidebarProps = {
     onFilterChange: (filters: {
@@ -10,24 +11,30 @@ type SidebarProps = {
 };
 
 const SidebarControl = ({ onFilterChange }: SidebarProps) => {
-    const [turbineId, setTurbineId] = useState("Turbine2");
+    const [turbineOptions, setTurbineOptions] = useState<string[]>([]);
+    const [turbineId, setTurbineId] = useState("");
     const [startDate, setStartDate] = useState("2016-01-01");
     const [endDate, setEndDate] = useState("2016-01-10");
     const [isLoading, setIsLoading] = useState(false);
 
-    // Available turbine options - you can make this dynamic
-    const turbineOptions = [
-        "Turbine1",
-        "Turbine2",
-        "Turbine3",
-        "Turbine4"
-    ];
-
     // Auto-apply filters on component mount
     useEffect(() => {
+        //load turbines from database 1st
+        fetchTurbines();
         handleApply();
     }, []); // Run once on mount
 
+    const fetchTurbines = async () => {
+        try {
+            const data = await fetchTurbineList();
+            setTurbineOptions(data);
+            setTurbineId(data[0] || '');
+
+        } catch (error) {
+            console.error('Failed to fetch turbine list:', error);
+            alert('Could not load turbine list. Please try again.');
+        }
+    }
     const handleApply = async () => {
         if (!startDate || !endDate) {
             alert("Please select both start and end dates");
