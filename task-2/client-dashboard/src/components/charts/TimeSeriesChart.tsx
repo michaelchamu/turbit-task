@@ -54,7 +54,16 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-semibold mb-4">Power Curve Summary for {turbineId} Located at {locationNames[Math.floor(Math.random() * 4)]}</h2>
+      <h2 className="text-xl font-semibold mb-4 flex items-center justify-between">
+        <span>
+          Power Curve Summary for {turbineId} Located at {locationNames[Math.floor(Math.random() * 4)]}
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 bg-green-500 rounded-full" title="Turbine Online"></span>
+          <span className="text-green-600 text-sm">(online)</span>
+        </span>
+      </h2>
+
       <div className="text-sm text-gray-600">
         {/* Date Range Info */}
         {startDate && endDate && (
