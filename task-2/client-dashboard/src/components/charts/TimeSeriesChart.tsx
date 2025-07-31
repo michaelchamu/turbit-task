@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Legend
 } from "recharts";
-
+import { MdOutlineWindPower } from "react-icons/md"
 //import data fetching service and interfaces
 import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/apiService";
 
@@ -50,17 +50,28 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   const avgExternalTemperature = data.reduce((acc, item) => acc + item.average_external_temperature, 0) / data.length;
   const avgInternalTemperature = data.reduce((acc, item) => acc + item.average_internal_temperature, 0) / data.length;
   const avgRPM = data.reduce((acc, item) => acc + item.average_rpm, 0) / data.length;
-  //const formattedStartDate = new Date(startDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  const locationIndex = Math.floor(Math.random() * 4);
+  const isOnline = Math.random() < 0.5;
+
 
   return (
     <div className="w-full">
       <h2 className="text-xl font-semibold mb-4 flex items-center justify-between">
+        { /*this section is pseudo-dynamic. I use a random number generator 
+        to select a location from the locationNames array then I use another random generator 
+        to give an online status. 
+         */}
         <span>
-          Power Curve Summary for {turbineId} Located at {locationNames[Math.floor(Math.random() * 4)]}
+          Power Curve Summary for {turbineId} Located at {locationNames[locationIndex]}
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-2.5 h-2.5 bg-green-500 rounded-full" title="Turbine Online"></span>
-          <span className="text-green-600 text-sm">(online)</span>
+          <span
+            className={`w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
+            title={isOnline ? 'Turbine Online' : 'Turbine Offline'}
+          />
+          <span className={`text-sm ${isOnline ? 'text-green-600' : 'text-red-600'}`}>
+            ({isOnline ? 'online' : 'offline'})
+          </span>
         </span>
       </h2>
 
@@ -92,9 +103,16 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       {/* Statistics */}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-3 rounded-lg shadow-sm">
-          <div className="text-sm text-gray-600">Avg Power</div>
-          <div className="text-lg font-semibold">{avgPower.toFixed(0)} kW</div>
+        <div className="bg-white p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-yellow-100 text-yellow-600 rounded-full p-2">
+            <MdOutlineWindPower className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-sm text-gray-600">Avg Power</div>
+            <div className="text-lg font-semibold text-gray-800">
+              {avgPower.toFixed(0)} kW
+            </div>
+          </div>
         </div>
         <div className="bg-white p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Max Power</div>
