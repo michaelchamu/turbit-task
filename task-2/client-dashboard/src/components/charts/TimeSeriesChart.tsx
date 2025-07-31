@@ -79,10 +79,10 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
         </span>
       </h2>
 
-      <div className="text-sm text-gray-600">
+      <div className="text-sm text-gray-600 mt-4">
         {/* Date Range Info */}
         {startDate && endDate && (
-          <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded">
+          <div className="text-md text-gray-600 bg-gray-50 p-2 rounded">
             <div>Selected range: {Math.ceil((new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 3600 * 24))} days,&nbsp;
 
               {new Date(startDate).toLocaleDateString("en-US",
@@ -106,7 +106,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       </div>
       {/* Statistics */}
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 ">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
         <div className="bg-yellow-100 p-3 rounded-lg shadow-sm flex items-center gap-3">
           <div className="bg-yellow-100 text-yellow-600 rounded-full p-2">
             <MdBolt className="w-5 h-5" />
