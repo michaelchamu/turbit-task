@@ -15,6 +15,7 @@ import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/ap
 import { FaWind } from "react-icons/fa";
 import { SiProtractor } from "react-icons/si";
 import { LiaTemperatureHighSolid } from "react-icons/lia";
+import { IoMdSpeedometer } from "react-icons/io";
 
 type TimeSeriesChartProps = {
   // Add props here later, e.g., data, selectedTurbine, etc.
@@ -137,6 +138,9 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
         </div>
         <div className="bg-blue-300 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-blue-300 text-blue-600 rounded-full p-2">
+            <IoMdSpeedometer className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Max Wind Speed</div>
           <div className="text-lg font-semibold">{maxWindSpeed.toFixed(0)} m/s</div>
         </div>
