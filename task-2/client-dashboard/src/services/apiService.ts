@@ -31,3 +31,19 @@ export const fetchTimeSeriesData = async (
         throw error; // rethrow the error for further handling
     }
 };
+
+export const fetchTurbineList = async ():
+    Promise<string[]> => {
+    try {
+        const response = await axios.get<string[]>(`${API_ENDPOINT}/turbines`);
+        //check if there are turbines in list or not
+        if (!response.data || response.data.length === 0) {
+            console.info('No Turbines');
+            return [];
+        }
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Turbines List:', error);
+        throw error;
+    }
+}
