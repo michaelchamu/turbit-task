@@ -107,3 +107,13 @@ async def get_power_curve(
             average_rpm = round(doc["average_rpm"])
         ))
     return results
+
+#use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db
+@route.get("/turbines", response_model=List[str])
+async def get_list_turbines():
+   
+    try:
+        turbinelist = await mongo_connector.mongodb.db['time-series-data'].distinct('metadata.turbine_id')
+        return turbinelist
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={e})
