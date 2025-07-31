@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import {
+  errorNotification,
+  infoNotification
+} from "../common/ToastNotification";
+import {
   LineChart,
   Line,
   CartesianGrid,
@@ -36,8 +40,12 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           end_date: endDate,
           // limit: 1000 // Adjust limit as needed
         });
+        if (!fetchedData || fetchedData.length === 0)
+          infoNotification("No Aggregated data for selected parameters.")
         setData(fetchedData);
+
       } catch (error) {
+        errorNotification("Failed to fetch time series data.");
         console.error("Failed to fetch time series data:", error);
       }
     };
