@@ -49,12 +49,12 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   const maxPower = Math.max(...data.map(d => d.average_power));
   const avgPower = data.reduce((acc, item) => acc + item.average_power, 0) / data.length;
   const avgWindSpeed = data.reduce((acc, item) => acc + item.average_wind_speed, 0) / data.length;
-  const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum'] // pick a random location name where the turbine is located
+  const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum', 'Stuttgart'] // pick a random location name where the turbine is located
   const avgAzimuth = data.reduce((acc, item) => acc + item.average_azimuth, 0) / data.length;
   const avgExternalTemperature = data.reduce((acc, item) => acc + item.average_external_temperature, 0) / data.length;
   const avgInternalTemperature = data.reduce((acc, item) => acc + item.average_internal_temperature, 0) / data.length;
   const avgRPM = data.reduce((acc, item) => acc + item.average_rpm, 0) / data.length;
-  const locationIndex = Math.floor(Math.random() * 4);
+  const locationIndex = Math.floor(Math.random() * 5);
   const isOnline = Math.random() < 0.5;
 
 
@@ -158,14 +158,14 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
             < LiaTemperatureHighSolid className="w-5 h-5" />
           </div>
           <div className="text-sm text-gray-600">Avg External Temp</div>
-          <div className="text-lg font-semibold">{avgExternalTemperature.toFixed(1)} &deg; C</div>
+          <div className="text-lg font-semibold">{avgExternalTemperature.toFixed(1)} &deg;C</div>
         </div>
         <div className="bg-cyan-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
           <div className="bg-cyan-200 text-cyan-600 rounded-full p-2">
             < LiaTemperatureHighSolid className="w-5 h-5" />
           </div>
           <div className="text-sm text-gray-600">Avg Internal Temp</div>
-          <div className="text-lg font-semibold">{avgInternalTemperature.toFixed(1)} &deg; C</div>
+          <div className="text-lg font-semibold">{avgInternalTemperature.toFixed(1)} &deg;C</div>
         </div>
         <div className="bg-purple-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
           <div className="bg-purple-200 text-purple-600 rounded-full p-2">
@@ -177,7 +177,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       </div>
 
       <div className="shadow-2xl rounded-lg border border-gray-200 bg-white p-4 flex items-center mt-4">
-        <ResponsiveContainer width="100%" height={550}>
+        <ResponsiveContainer width="100%" height={350}>
           <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 50 }}>
             <CartesianGrid stroke="#ccc" strokeDasharray="3 3" />
             <XAxis
