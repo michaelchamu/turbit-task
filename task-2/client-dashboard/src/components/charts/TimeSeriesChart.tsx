@@ -13,6 +13,8 @@ import { MdOutlineWindPower, MdBolt } from "react-icons/md"
 //import data fetching service and interfaces
 import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/apiService";
 import { FaWind } from "react-icons/fa";
+import { SiProtractor } from "react-icons/si";
+import { LiaTemperatureHighSolid } from "react-icons/lia";
 
 type TimeSeriesChartProps = {
   // Add props here later, e.g., data, selectedTurbine, etc.
@@ -142,18 +144,30 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
       <br />
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="bg-green-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-green-200 text-green-600 rounded-full p-2">
+            <SiProtractor className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Avg Azimuth</div>
           <div className="text-lg font-semibold">{avgAzimuth.toFixed(0)} &deg;</div>
         </div>
         <div className="bg-red-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-red-200 text-red-600 rounded-full p-2">
+            < LiaTemperatureHighSolid className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Avg External Temp</div>
           <div className="text-lg font-semibold">{avgExternalTemperature.toFixed(1)} &deg; C</div>
         </div>
-        <div className="bg-cyan-500 p-3 rounded-lg shadow-sm flex items-center gap-3">
+        <div className="bg-cyan-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-cyan-200 text-cyan-600 rounded-full p-2">
+            < LiaTemperatureHighSolid className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Avg Internal Temp</div>
           <div className="text-lg font-semibold">{avgInternalTemperature.toFixed(1)} &deg; C</div>
         </div>
         <div className="bg-purple-200 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-purple-200 text-purple-600 rounded-full p-2">
+            <MdOutlineWindPower className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Avg Rotor Speed</div>
           <div className="text-lg font-semibold">{avgRPM.toFixed(1)} rpm</div>
         </div>
