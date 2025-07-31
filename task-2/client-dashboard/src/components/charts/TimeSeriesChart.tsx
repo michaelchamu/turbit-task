@@ -116,10 +116,14 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
           </div>
         </div>
 
-        <div className="bg-amber-400 p-3 rounded-lg shadow-sm">
+        <div className="bg-amber-400 p-3 rounded-lg shadow-sm flex items-center gap-3">
+          <div className="bg-amber-400 text-yellow-600 rounded-full p-2">
+            <MdBolt className="w-5 h-5" />
+          </div>
           <div className="text-sm text-gray-600">Max Power</div>
           <div className="text-lg font-semibold">{maxPower.toFixed(0)} kW</div>
         </div>
+
         <div className="bg-blue-200 p-3 rounded-lg shadow-sm">
           <div className="text-sm text-gray-600">Avg Wind Speed</div>
           <div className="text-lg font-semibold">{avgWindSpeed.toFixed(1)} m/s</div>
