@@ -29,7 +29,7 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
     power = float(row['Leistung'].replace(',', '.')) if row['Leistung'] else 0.0
     wind_speed = float(row['Wind'].replace(',', '.')) if row['Wind'] else None
     azimuth = float(row['Azimut'].replace(',', '.')) if row['Azimut'] else 0.0
-    external_temperature = float(row['Leistung'].replace(',', '.')) if row['Leistung'] else 0.0
+    external_temperature = float(row['Außen'].replace(',', '.')) if row['Außen'] else 0.0
     internal_temperature = float(row['Lager'].replace(',', '.')) if row['Lager'] else 0.0
     rpm = float(row['Rotor'].replace(',', '.')) if row['Rotor'] else 0.0
     #csv files do not have longitude and latitude, so this is handled here
