@@ -20,6 +20,7 @@ import { FaWind } from "react-icons/fa";
 import { SiProtractor } from "react-icons/si";
 import { LiaTemperatureHighSolid } from "react-icons/lia";
 import { IoMdSpeedometer } from "react-icons/io";
+import { CustomTooltip } from "./ToolTip";
 
 type TimeSeriesChartProps = {
   // Add props here later, e.g., data, selectedTurbine, etc.
@@ -224,8 +225,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
               domain={[0, Math.ceil(maxPower / 100) * 100]}
               label={{ value: 'Average Power output (kW)', angle: -90, offset: -5, position: 'insideLeft', style: { textAnchor: 'middle' } }}
             />
-
-            <Tooltip />
+            <Tooltip content={<CustomTooltip />} />
             <Legend verticalAlign="top" height={36} />
             <Line type="monotone" dataKey="average_power" stroke="#8884d8" name="Power Output" />
 
