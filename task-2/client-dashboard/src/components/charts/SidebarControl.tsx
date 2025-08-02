@@ -1,7 +1,7 @@
 // Sidebar.tsx
 import { useState, useEffect } from "react";
 import { fetchTurbineList } from "../../services/apiService";
-import { errorNotification, warningNotification } from "../common/ToastNotification";
+import { errorNotification, infoNotification, warningNotification } from "../common/ToastNotification";
 
 type SidebarProps = {
     onFilterChange: (filters: {
@@ -28,6 +28,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
     const fetchTurbines = async () => {
         try {
             const data = await fetchTurbineList();
+            //further check, if data is empty TODO
             setTurbineOptions(data);
             setTurbineId(data[0] || '');
 
