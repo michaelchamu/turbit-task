@@ -1,7 +1,9 @@
 // Sidebar.tsx
 import { useState, useEffect } from "react";
 import { fetchTurbineList } from "../../services/apiService";
-import { errorNotification, infoNotification, warningNotification } from "../common/ToastNotification";
+import { errorNotification, warningNotification } from "../common/ToastNotification";
+//import custom logger
+import logger from '../../utils/logger';
 
 type SidebarProps = {
     onFilterChange: (filters: {
@@ -33,7 +35,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
             setTurbineId(data[0] || '');
 
         } catch (error) {
-            console.error('Failed to fetch turbine list:', error);
+            logger.error('Failed to fetch turbine list:', error);
             errorNotification('Could not load turbine list. Please try again.');
         }
     }
@@ -76,7 +78,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
                 endDate: formattedEndDate
             });
         } catch (error) {
-            console.error("Error applying filters:", error);
+            logger.error("Error applying filters:", error);
             errorNotification("Error applying filters. Please try again.");
         } finally {
             setIsLoading(false);
