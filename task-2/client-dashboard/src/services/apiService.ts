@@ -3,9 +3,6 @@ import type { TimeSeriesDataPoint, QueryParameters } from '../types/interfaces';
 
 const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
 
-
-
-
 export const fetchTimeSeriesData = async (
     params?: QueryParameters
 ): Promise<TimeSeriesDataPoint[]> => {
