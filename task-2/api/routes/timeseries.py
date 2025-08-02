@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, status
 from typing import List, Optional
 from datetime import datetime, timedelta
+from fastapi.responses import JSONResponse
 from pymongo import ASCENDING
 
 from ..database import mongo_connector
@@ -35,7 +36,11 @@ async def get_time_series_data(
         results = await cursor.to_list(length=limit)
 
         # Convert the fetched data to TimeSeriesModel instances
-        return [TimeSeriesModel(**data) for data in results]
+        #return with status code to make it easier client side to handle different actions
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content=[TimeSeriesModel(**data).model_dump() for data in results]
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -106,7 +111,10 @@ async def get_power_curve(
             average_internal_temperature=round(doc["average_internal_temperature"]),
             average_rpm = round(doc["average_rpm"])
         ))
-    return results
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=[return_data.dict() for return_data in results]
+    )
 
 #use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db
 @route.get("/turbines", response_model=List[str])
