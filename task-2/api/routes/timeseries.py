@@ -9,6 +9,9 @@ from ..models.timeseries import TimeSeriesModel, AggregatedTimeSeriesModel
 
 route = APIRouter()
 
+#This was the initial endpoint I envisioned, just keeping for posterity
+#it simply pulled all data, unaggregated and showed timestamps etc
+#overally, it wasnt a good way of showcasing timeseries data at 10min intervals
 @route.get("/timeseries", response_model=List[TimeSeriesModel])
 async def get_time_series_data(
     turbine_id: Optional[str] = None,
