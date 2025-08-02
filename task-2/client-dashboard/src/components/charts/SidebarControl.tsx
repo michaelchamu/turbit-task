@@ -37,8 +37,10 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
         }
     }
     const handleApply = async () => {
+        //this can be redundant as I am already forcing strict date formatting on load
+        //users arent able to type dates that are skew. TODO - Perhaps remove after more testing
         if (!startDate || !endDate) {
-            alert("Please select both start and end dates");
+            warningNotification("Please select both start and end dates");
             return;
         }
 
@@ -47,7 +49,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
         const end = new Date(endDate);
 
         if (start >= end) {
-            alert("Start date must be before end date");
+            warningNotification("Start date must be before end date");
             return;
         }
 
