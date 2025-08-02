@@ -1,7 +1,7 @@
 // Sidebar.tsx
 import { useState, useEffect } from "react";
 import { fetchTurbineList } from "../../services/apiService";
-import { errorNotification, infoNotification, successNotification, warningNotification } from "../common/ToastNotification";
+import { errorNotification, warningNotification } from "../common/ToastNotification";
 
 type SidebarProps = {
     onFilterChange: (filters: {
