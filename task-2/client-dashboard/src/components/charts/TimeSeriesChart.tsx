@@ -57,6 +57,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   if (!data || data.length === 0)
     return <NoDataView />
 
+  //otherwise start building summaries and rendering chart
   // get statistical summaries
   const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum', 'Stuttgart'] // pick a random location name where the turbine is located
   const locationIndex = Math.floor(Math.random() * 5);
