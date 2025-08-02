@@ -10,7 +10,7 @@ export const fetchTimeSeriesData = async (
         const response = await axios.get<TimeSeriesDataPoint[]>(`${API_ENDPOINT}/aggregated_timeseries`, {
             params
         });
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 204) {
             return response.data;
         } else {
             throw new Error(`Unexpected response status: ${response.status}`);
@@ -27,9 +27,9 @@ export const fetchTurbineList = async ():
     try {
         const response = await axios.get<string[]>(`${API_ENDPOINT}/turbines`);
         //check if there are turbines in list or not
-        if (!response.data || response.data.length === 0) {
+        if (response.status === 204) {
             console.info('No Turbines');
-            return [];
+            return [];// just set the dropdown to empty for now
         }
         return response.data;
     } catch (error) {
