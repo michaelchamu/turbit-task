@@ -1,21 +1,9 @@
 import axios from 'axios';
+import type { TimeSeriesDataPoint, QueryParameters } from '../types/interfaces';
 
 const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
 
-export interface TimeSeriesDataPoint {
-    average_wind_speed: number;
-    average_power: number;
-    average_azimuth: number;
-    average_external_temperature: number;
-    average_internal_temperature: number;
-    average_rpm: number;
-}
 
-interface QueryParameters {
-    turbine_id?: string;
-    start_date?: string;
-    end_date?: string;
-}
 
 
 export const fetchTimeSeriesData = async (
@@ -25,7 +13,12 @@ export const fetchTimeSeriesData = async (
         const response = await axios.get<TimeSeriesDataPoint[]>(`${API_ENDPOINT}/aggregated_timeseries`, {
             params
         });
-        return response.data;
+        if (response.status === 200) {
+            return response.data;
+        } else {
+            throw new Error(`Unexpected response status: ${response.status}`);
+        }
+
     } catch (error) {
         console.error('Error fetching time series data:', error);
         throw error; // rethrow the error for further handling
