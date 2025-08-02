@@ -20,6 +20,7 @@ import { type TimeSeriesDataPoint } from "../../types/interfaces";
 
 import { CustomTooltip } from "./ToolTip";
 import { DataSummary } from "./DataSummary";
+import { NoDataView } from "../common/NoData";
 
 type TimeSeriesChartProps = {
   // Add props here later, e.g., data, selectedTurbine, etc.
@@ -42,6 +43,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
         });
         if (!fetchedData || fetchedData.length === 0)
           infoNotification("No Aggregated data for selected parameters.")
+
         setData(fetchedData);
 
       } catch (error) {
@@ -51,15 +53,19 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
     };
     load();
   }, [turbineId, startDate, endDate]);
+  //if no data straigh away return nodata component
+  if (!data || data.length === 0)
+    return <NoDataView />
 
   // get statistical summaries
+  const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum', 'Stuttgart'] // pick a random location name where the turbine is located
+  const locationIndex = Math.floor(Math.random() * 5);
+
+  const isOnline = Math.random() < 0.5;
   //step is important to remove any NaN or other wild values
   //before adding this step, -Infinity was being returned whenever theres no data from the API
-
-  const locationNames = ['Bremen', 'Oldenburg', 'Hamburg', 'Bochum', 'Borkum', 'Stuttgart'] // pick a random location name where the turbine is located
-
-  const locationIndex = Math.floor(Math.random() * 5);
-  const isOnline = Math.random() < 0.5;
+  //it already exists in the sumarries component but im redeclaring and reusing this becaus we need it to calculate the upper limit of the y axis
+  //TODO declare once and reuse while managing its state
   const validPowers = data
     .map(d => d.average_power)
     .filter(p => Number.isFinite(p));
