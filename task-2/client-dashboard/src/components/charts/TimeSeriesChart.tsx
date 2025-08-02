@@ -18,6 +18,9 @@ import {
 import { fetchTimeSeriesData } from "../../services/apiService";
 import { type TimeSeriesDataPoint } from "../../types/interfaces";
 
+//import logger instance
+import logger from '../../utils/logger';
+
 import { CustomTooltip } from "./ToolTip";
 import { DataSummary } from "./DataSummary";
 import { NoDataView } from "../common/NoData";
@@ -33,6 +36,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
   const [data, setData] = useState<TimeSeriesDataPoint[]>([]);
 
   useEffect(() => {
+    logger.info("TimeSeries mounted");
     const load = async () => {
       try {
         const fetchedData = await fetchTimeSeriesData({
@@ -48,7 +52,7 @@ const TimeSeriesChart = ({ turbineId, startDate, endDate }: TimeSeriesChartProps
 
       } catch (error) {
         errorNotification("Failed to fetch time series data.");
-        console.error("Failed to fetch time series data:", error);
+        logger.error("Failed to fetch time series data:", error);
       }
     };
     load();
