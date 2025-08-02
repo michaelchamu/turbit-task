@@ -15,7 +15,8 @@ import {
 } from "recharts";
 
 //import data fetching service and interfaces
-import { fetchTimeSeriesData, type TimeSeriesDataPoint } from "../../services/apiService";
+import { fetchTimeSeriesData } from "../../services/apiService";
+import { type TimeSeriesDataPoint } from "../../types/interfaces";
 
 import { CustomTooltip } from "./ToolTip";
 import { DataSummary } from "./DataSummary";
