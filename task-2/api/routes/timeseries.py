@@ -4,8 +4,11 @@ from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from pymongo import ASCENDING
 
+
 from ..database import mongo_connector
 from ..models.timeseries import TimeSeriesModel, AggregatedTimeSeriesModel
+
+#TODO setup logger instead of using print statements
 
 route = APIRouter()
 
@@ -110,14 +113,16 @@ async def get_power_curve(
             average_wind_speed=round(doc["avg_wind_speed"], 2),
             average_power=round(doc["average_power"], 2),
             average_azimuth=round(doc["avg_azimuth"], 2),
-            average_external_temperature=round(doc["average_external_temperature"]),
-            average_internal_temperature=round(doc["average_internal_temperature"]),
-            average_rpm = round(doc["average_rpm"])
+            average_external_temperature=round(doc["average_external_temperature"], 2),
+            average_internal_temperature=round(doc["average_internal_temperature"], 2),
+            average_rpm = round(doc["average_rpm"], 2)
         ))
-    return JSONResponse(
-        status_code=status.HTTP_200_OK,
-        content=[return_data.dict() for return_data in results]
-    )
+    if not results:
+        return JSONResponse(
+            status_code=status.HTTP_204_NO_CONTENT,
+            content=[]
+        )
+    return results
 
 #use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db
 @route.get("/turbines", response_model=List[str])
@@ -125,6 +130,14 @@ async def get_list_turbines():
    
     try:
         turbinelist = await mongo_connector.mongodb.db['time-series-data'].distinct('metadata.turbine_id')
-        return turbinelist
+        #to avoid serialisation problems in tests and api calls etcexplicitly  convert result to list
+        turbinelist = list(turbinelist)
+        if not turbinelist:
+            #here, to ensure client always knows resource is available but data is empty, we set status to 204
+            return JSONResponse(
+                status_code=status.HTTP_204_NO_CONTENT,
+                content=[]
+            )
+        return turbinelist #if successful, 200 is implied anyway, so no need to return json response with specific status code
     except Exception as e:
-        raise HTTPException(status_code=500, detail={e})
+        raise HTTPException(status_code=500, detail=str(e))
