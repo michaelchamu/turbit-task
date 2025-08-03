@@ -1,8 +1,8 @@
-// Sidebar.tsx
 import { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { fetchTurbineList } from "../../services/apiService";
 import { errorNotification, warningNotification } from "../common/ToastNotification";
-//import custom logger
 import logger from '../../utils/logger';
 
 type SidebarProps = {
@@ -16,38 +16,36 @@ type SidebarProps = {
 const SidebarControl = ({ onFilterChange }: SidebarProps) => {
     const [turbineOptions, setTurbineOptions] = useState<string[]>([]);
     const [turbineId, setTurbineId] = useState("");
-    const [startDate, setStartDate] = useState("2016-01-01");
-    const [endDate, setEndDate] = useState("2016-01-10");
+    const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+        new Date("2016-01-01"),
+        new Date("2016-01-10")
+    ]);
+    const [startDate, endDate] = dateRange;
     const [isLoading, setIsLoading] = useState(false);
 
-    // Auto-apply filters on component mount
     useEffect(() => {
-        //load turbines from database 1st
         fetchTurbines();
         handleApply();
-    }, []); // Run once on mount
+    }, []);
 
     const fetchTurbines = async () => {
         try {
             const data = await fetchTurbineList();
-            //further check, if data is empty TODO
             setTurbineOptions(data);
             setTurbineId(data[0] || '');
-
         } catch (error) {
             logger.error('Failed to fetch turbine list:', error);
             errorNotification('Could not load turbine list. Please try again.');
         }
-    }
+    };
+
     const handleApply = async () => {
-        //this can be redundant as I am already forcing strict date formatting on load
-        //users arent able to type dates that are skew. TODO - Perhaps remove after more testing
+
         if (!startDate || !endDate) {
-            warningNotification("Please select both start and end dates");
+            warningNotification("Please select both start and end dates.");
             return;
         }
 
-        // Validate date range
         const start = new Date(startDate);
         const end = new Date(endDate);
 
@@ -56,7 +54,6 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
             return;
         }
 
-        // Check if date range is too large (optional)
         const daysDiff = (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
         if (daysDiff > 365) {
             const proceed = window.confirm(
@@ -68,9 +65,8 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
         setIsLoading(true);
 
         try {
-            // Format dates to include time for the API
-            const formattedStartDate = `${startDate}T00:00:00`;
-            const formattedEndDate = `${endDate}T23:59:59`;
+            const formattedStartDate = `${startDate.toISOString().split('T')[0]}T00:00:00`;
+            const formattedEndDate = `${endDate.toISOString().split('T')[0]}T23:59:59`;
 
             onFilterChange({
                 turbineId,
@@ -85,21 +81,16 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
         }
     };
 
-    // Quick date range presets
     const handleQuickDate = (days: number) => {
         const end = new Date();
         const start = new Date();
         start.setDate(end.getDate() - days);
-
-        setStartDate(start.toISOString().split('T')[0]);
-        setEndDate(end.toISOString().split('T')[0]);
+        setDateRange([start, end]);
     };
 
-    // Reset to default values
     const handleReset = () => {
         setTurbineId("Turbine2");
-        setStartDate("2016-01-01");
-        setEndDate("2016-01-10");
+        setDateRange([new Date("2016-01-01"), new Date("2016-01-10")]);
     };
 
     return (
@@ -124,42 +115,25 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
                 </select>
             </div>
 
-            {/* Date Range Selection */}
-            <div className="space-y-3">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Date Range
-                    </label>
-                    <div className="flex items-end gap-2">
-                        <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-500 mb-1">
-                                From
-                            </label>
-                            <input
-                                type="date"
-                                className="w-full h-[40px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                max={endDate}
-                            />
-                        </div>
-                        <div className="text-gray-400 pb-2">
-                            —
-                        </div>
-                        <div className="flex-1">
-                            <label className="block text-xs font-medium text-gray-500 mb-1">
-                                To
-                            </label>
-                            <input
-                                type="date"
-                                className="w-full h-[40px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                min={startDate}
-                            />
-                        </div>
-                    </div>
-                </div>
+            {/* Unified Date Range Picker */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Date Range
+                </label>
+                <DatePicker
+                    selectsRange
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChange={(update) => {
+                        setDateRange(update);
+                    }}
+                    showMonthDropdown
+                    showYearDropdown
+                    isClearable={true}
+                    className="w-full h-[40px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    dateFormat="yyyy-MM-dd"
+                    placeholderText="Select date range"
+                />
             </div>
 
             {/* Quick Date Presets */}
