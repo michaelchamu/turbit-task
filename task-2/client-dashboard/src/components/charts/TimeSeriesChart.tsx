@@ -21,8 +21,8 @@ import { type TimeSeriesDataPoint } from "../../types/interfaces";
 //import logger instance
 import logger from '../../utils/logger';
 
-import { CustomTooltip } from "./ToolTip";
-import { DataSummary } from "./DataSummary";
+import { CustomTooltip } from "../layout/ToolTip";
+import { DataSummary } from "../layout/DataSummary";
 import { NoDataView } from "../common/NoData";
 
 type TimeSeriesChartProps = {
