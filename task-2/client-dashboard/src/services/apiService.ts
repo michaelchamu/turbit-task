@@ -1,13 +1,12 @@
-import axios from 'axios';
 import type { TimeSeriesDataPoint, QueryParameters } from '../types/interfaces';
+import { _get } from '../utils/http_utility';
 
-const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
 
 export const fetchTimeSeriesData = async (
     params?: QueryParameters
 ): Promise<TimeSeriesDataPoint[]> => {
     try {
-        const response = await axios.get<TimeSeriesDataPoint[]>(`${API_ENDPOINT}/aggregated_timeseries`, {
+        const response = await _get(`/aggregated_timeseries`, {
             params
         });
         if (response.status === 200 || response.status === 204) {
@@ -25,7 +24,7 @@ export const fetchTimeSeriesData = async (
 export const fetchTurbineList = async ():
     Promise<string[]> => {
     try {
-        const response = await axios.get<string[]>(`${API_ENDPOINT}/turbines`);
+        const response = await _get(`/turbines`);
         //check if there are turbines in list or not
         if (response.status === 204) {
             console.info('No Turbines');
