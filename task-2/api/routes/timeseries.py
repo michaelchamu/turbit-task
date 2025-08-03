@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from pymongo import ASCENDING
 
 
-from ..database import mongo_connector
+from mongoconnector import mongo_connector
 from ..models.timeseries import TimeSeriesModel, AggregatedTimeSeriesModel
 
 #TODO setup logger instead of using print statements
