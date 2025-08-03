@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 from fastapi.concurrency import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
-
-from .database import mongo_connector  # import the MongoDB connection functions
+from mongoconnector import mongo_connector  # import the MongoDB connection functions
 from .services import csv_service  # import the CSV service
 from .routes import timeseries  # import the time-series routes
 
@@ -14,7 +13,7 @@ origins = ["http://localhost:3000",
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await mongo_connector.connect_to_mongo()
+    await mongo_connector.connect_to_mongo('time-series-data')
     await csv_service.populate_time_series(mongo_connector.mongodb.db)
     print("Application started and connected to MongoDB")
     yield  # This is where the application runs
