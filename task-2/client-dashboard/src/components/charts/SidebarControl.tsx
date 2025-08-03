@@ -84,7 +84,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
     };
 
     const handleReset = () => {
-        setTurbineId("Turbine2");
+        setTurbineId("Turbine1");
         setDateRange([new Date("2016-01-01"), new Date("2016-01-10")]);
     };
 
