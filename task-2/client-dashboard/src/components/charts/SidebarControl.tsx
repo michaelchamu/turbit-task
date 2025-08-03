@@ -112,7 +112,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
 
             {/* Unified Date Range Picker */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                     Date Range
                 </label>
                 <DatePicker
@@ -128,8 +128,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
                     className="w-full h-[40px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     dateFormat="yyyy-MM-dd"
                     placeholderText="Select date range"
-                />
-            </div>
+                /></div>
 
             {/* Quick Date Presets */}
             <div>
