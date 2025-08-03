@@ -15,7 +15,7 @@ import {
 } from "recharts";
 
 //import data fetching service and interfaces
-import { fetchTimeSeriesData } from "../../services/apiService";
+import { fetchTimeSeriesData } from "../../services/api_service";
 import { type TimeSeriesDataPoint } from "../../types/interfaces";
 
 //import logger instance

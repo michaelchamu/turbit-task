@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { fetchTurbineList } from "../../services/apiService";
+import { fetchTurbineList } from "../../services/api_service";
 import { errorNotification, warningNotification } from "../common/ToastNotification";
 import logger from '../../utils/logger';
 
