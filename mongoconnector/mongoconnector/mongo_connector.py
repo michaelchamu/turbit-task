@@ -1,5 +1,4 @@
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import FastAPI
 import os
 from dotenv import load_dotenv
 
@@ -18,14 +17,14 @@ class MongoDB:
 
 mongodb = MongoDB()
 
-async def connect_to_mongo():
+async def connect_to_mongo(database: str):
     mongodb.client = AsyncIOMotorClient(
         host=database_url,
         port=int(database_port),
         username=database_username,
         password=database_password
     )
-    mongodb.db = mongodb.client['users-demo']
+    mongodb.db = mongodb.client[database]
     print("Connected to MongoDB")
 
 async def close_mongo_connection():

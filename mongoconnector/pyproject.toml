@@ -1,0 +1,14 @@
+[project]
+name = "mongoconnector"
+version = "0.1.0"
+description = "Reusable MongoDB connector for FastAPI projects. You just pass the database name and can reuse across multiple"
+authors = [{ name = "Michael Chamunorwa", email = "you@example.com" }]
+dependencies = [
+    "motor",
+    "python-dotenv"
+]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
