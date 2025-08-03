@@ -4,8 +4,6 @@ from mongoconnector import mongo_connector #import the MongoDB connection functi
 from .services import populate_db
 from .routes import users, posts, comments, reports #import all defined routes
 
-app = FastAPI() #initialize the FastAPI application
-
 #When the application starts, connect to MongoDB uisng lifespan context manager
 #When the application stops, close the MongoDB connection
 #This ensures that the database connection is properly managed throughout the application's lifecycle
@@ -23,7 +21,7 @@ async def lifespan(app: FastAPI):
     yield   # This is where the application runs
     await mongo_connector.close_mongo_connection()
 
-app = FastAPI(lifespan=lifespan)  # Use the lifespan context manager
+app = FastAPI(lifespan=lifespan, title="UsersAPI")  # Use the lifespan context manager
 
 app.include_router(users.route)
 app.include_router(posts.route)
