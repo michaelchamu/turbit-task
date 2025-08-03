@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
     yield  # This is where the application runs
     await mongo_connector.close_mongo_connection()
 
-app = FastAPI(lifespan=lifespan)  # Use the lifespan context manager
+app = FastAPI(lifespan=lifespan, title="TurbineDataApi")  # Use the lifespan context manager
 
 #add CORS middleware here to allow cross-origin requests
 #if added at the top, it will be overwritten and will cause CORS issues
