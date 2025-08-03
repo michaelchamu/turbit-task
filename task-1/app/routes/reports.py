@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from typing import List
-from ..database import mongo_connector
+from mongoconnector import mongo_connector
 from ..models.report import CommentSummary, PostSummary, UserReportModel
 
 route = APIRouter()

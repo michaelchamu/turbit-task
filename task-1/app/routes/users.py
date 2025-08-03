@@ -1,7 +1,7 @@
 #all routes to access user data
 from fastapi import APIRouter, HTTPException
 from typing import List
-from ..database import mongo_connector
+from mongoconnector import mongo_connector
 from ..models.user import UserModel
 
 route = APIRouter()
