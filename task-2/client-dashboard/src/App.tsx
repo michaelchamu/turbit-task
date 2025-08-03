@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import TimeseriesChart from './components/charts/TimeSeriesChart';
-import SidebarControl from './components/charts/SidebarControl';
+import SidebarControl from './components/controls/SidebarControl';
 
 const App = () => {
   const [filters, setFilters] = useState<{
