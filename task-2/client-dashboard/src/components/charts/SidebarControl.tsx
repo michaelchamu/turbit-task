@@ -49,11 +49,6 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
         const start = new Date(startDate);
         const end = new Date(endDate);
 
-        if (start >= end) {
-            warningNotification("Start date must be before end date");
-            return;
-        }
-
         const daysDiff = (end.getTime() - start.getTime()) / (1000 * 3600 * 24);
         if (daysDiff > 365) {
             const proceed = window.confirm(
