@@ -20,3 +20,15 @@ async def get_comments():
         return comments
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+    
+
+@route.get("/comments/{comment_id}", response_model=CommentModel)
+async def get_single_comment(comment_id: int):
+    try:
+        comment = await mongo_connector.mongodb.db["comments"].find_one({"id": comment_id})
+        if not comment:
+            raise HTTPException(status_code=404, detail="Comment not found")
+        return comment
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e)) 
+
