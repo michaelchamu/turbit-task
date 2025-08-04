@@ -5,15 +5,21 @@ from mongoconnector import mongo_connector  # import the MongoDB connection func
 from .services import csv_service  # import the CSV service
 from .routes import timeseries  # import the time-series routes
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 # Configure CORS middleware to allow requests from the React App and other origins
 origins = ["http://localhost:3000",
            "http://localhost:5173",
-           "http://127.0.0.1:5173", 
+           "http://127.0.0.1:5173",
+            os.getenv('PRODUCTION_CLIENT')
            ]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await mongo_connector.connect_to_mongo('time-series-data')
+    await mongo_connector.connect_to_mongo(os.getenv('TURBINES_COLLECTION'))
     await csv_service.populate_time_series(mongo_connector.mongodb.db)
     print("Application started and connected to MongoDB")
     yield  # This is where the application runs
