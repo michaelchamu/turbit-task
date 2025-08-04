@@ -11,7 +11,7 @@ from fastapi import FastAPI
 
 collection_names = ["users", "posts", "comments"]
 base_url = os.getenv("JSON_PLACEHOLDER")
-
+#TODO Check duplication and only write new records
 async def populate_db(db: AsyncIOMotorClient):
     #1st fetch all collections in the database to prevent multiple round trips
     existing_collections = await db.list_collection_names()
