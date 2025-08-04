@@ -43,12 +43,15 @@ async def get_time_series_data(
 
         # Convert the fetched data to TimeSeriesModel instances
         #return with status code to make it easier client side to handle different actions
-        return JSONResponse(
-            status_code=status.HTTP_200_OK,
-            content=[TimeSeriesModel(**data).model_dump() for data in results]
-        )
+        #not adding status 200 because it will be returned in any case on success but must make distinction on 204(empty)
+        if not results:
+            return JSONResponse(
+                status_code=status.HTTP_204_NO_CONTENT,
+                content=[]
+            )
+        return results
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 #data is a lot and must be cleaned and summarised (aggregated and binned) to allow creating smoother graphs
 #a simple model that returns a list with windspeed and power is used
@@ -140,4 +143,4 @@ async def get_list_turbines():
             )
         return turbinelist #if successful, 200 is implied anyway, so no need to return json response with specific status code
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
