@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Response
 from typing import List
 
 from fastapi.responses import JSONResponse
@@ -19,7 +19,8 @@ async def get_user_reports():
         user_reports = []
         for user in users:
             user_posts = [post for post in posts if post['userId'] == user['id']]
-            user_comments = [comment for comment in comments if comment['postId'] in [p['id'] for p in user_posts]]
+            user_post_ids = [p['id'] for p in user_posts]
+            user_comments = [comment for comment in comments if comment['postId'] in user_post_ids]
             report = UserReportModel(
                 id=user['id'],
                 name=user['name'],
@@ -30,14 +31,12 @@ async def get_user_reports():
                 comments_count=len(user_comments)
             )
             user_reports.append(report)
-        if not user_reports:
-            return JSONResponse(
-                status_code=status.HTTP_204_NO_CONTENT,
-                content=[]
-            )
+        # If there are no users, return 204 No Content
+        if not users:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
         return user_reports
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e))
     
 #this route fetches a report for a specific user by their ID
 @route.get("/reports/{user_id}", response_model=UserReportModel)
@@ -59,11 +58,7 @@ async def get_user_report(user_id: int):
             posts_count=len(posts),
             comments_count=len(comments)
         )
-        if not report:
-            return JSONResponse(
-                    status_code=status.HTTP_204_NO_CONTENT,
-                    content=[]
-            )
+        #no need to check if report is empty because it will always have the user at the minimum
         return report
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e)) 
