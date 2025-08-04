@@ -23,3 +23,4 @@ task-2/.DS_Store
 *.pyo
 *.pyd
 __pycache__/
+task-2/client-dashboard/.env.*
