@@ -1,8 +1,9 @@
 //this exports a reusable instace of axios so that
 //we d
 import axios from "axios";
-const API_ENDPOINT = import.meta.env.API_ENDPOINT || 'http://localhost:8000';
+const API_ENDPOINT: string = import.meta.env.VITE_APP_API_ENDPOINT;
 
+console.log(API_ENDPOINT)
 const apiClient = axios.create({
     baseURL: API_ENDPOINT,
     headers: {
