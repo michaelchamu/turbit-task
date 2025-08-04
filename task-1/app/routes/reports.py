@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from typing import List
+
+from fastapi.responses import JSONResponse
 from mongoconnector import mongo_connector
 from ..models.report import CommentSummary, PostSummary, UserReportModel
 
@@ -28,10 +30,14 @@ async def get_user_reports():
                 comments_count=len(user_comments)
             )
             user_reports.append(report)
-
+        if not user_reports:
+            return JSONResponse(
+                status_code=status.HTTP_204_NO_CONTENT,
+                content=[]
+            )
         return user_reports
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     
 #this route fetches a report for a specific user by their ID
 @route.get("/reports/{user_id}", response_model=UserReportModel)
@@ -53,6 +59,11 @@ async def get_user_report(user_id: int):
             posts_count=len(posts),
             comments_count=len(comments)
         )
+        if not report:
+            return JSONResponse(
+                    status_code=status.HTTP_204_NO_CONTENT,
+                    content=[]
+            )
         return report
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)) 

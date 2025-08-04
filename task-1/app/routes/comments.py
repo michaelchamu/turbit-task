@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, status
 from typing import List
 
 from fastapi.responses import JSONResponse
@@ -14,9 +14,9 @@ async def get_comments():
         comments = await mongo_connector.mongodb.db['comments'].find().to_list(length=None)
         if not comments:
             return JSONResponse(
-                status_code=204,
+                status_code=status.HTTP_204_NO_CONTENT,
                 content=[]
             )
         return comments
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
