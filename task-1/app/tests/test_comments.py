@@ -1,0 +1,132 @@
+from unittest.mock import AsyncMock, patch
+from bson import ObjectId
+from fastapi.testclient import TestClient
+import pytest
+from ..main import app
+
+client = TestClient(app)
+
+@pytest.fixture
+def mock_comments():
+    return [
+        {"_id": ObjectId(), "id": 1, "postId":"1", "name": "Post 1", "email": "ddd@rrr.com", "body":"Wow"},
+        {"_id": ObjectId(), "id": 2, "postId":"2", "name": "Post 2", "email": "dsss@rrr.com", "body":"Noo"}
+    ]
+
+def test_fetch_comments_empty():
+    """Test empty comments list response"""
+    with patch('app.routes.comments.mongo_connector.mongodb') as mock_mongodb:
+        # Mock the entire MongoDB chain
+        mock_db = mock_mongodb.db
+        mock_collection = mock_db['comments']
+        
+        # Setup method chain for the query
+        mock_find = mock_collection.find.return_value
+        mock_sort = mock_find.sort.return_value
+        mock_limit = mock_sort.limit.return_value
+        mock_limit.to_list = AsyncMock(return_value=[])
+        
+        response = client.get("/comments")
+        assert response.status_code == 200
+        
+        # Verify the exact response structure
+        assert response.json() == {
+            "comments": [],
+            "next_cursor": None, 
+            "has_more": False,
+            "count": 0
+        }
+        
+        # Verify the MongoDB query was constructed correctly
+        mock_collection.find.assert_called_once_with({})
+        mock_find.sort.assert_called_once_with("_id", -1)
+        mock_sort.limit.assert_called_once_with(21)  # limit + 1 for pagination check
+
+def test_fetch_single_comment(mock_comments: any):
+    '''Fetches single comment with correct id'''
+    with patch('app.routes.comments.mongo_connector.mongodb') as mock_mongodb:
+         # Setup async mock chain
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
+        
+        mock_collection = AsyncMock()
+        mock_db.__getitem__.return_value = mock_collection
+        
+        # Mock the async find_one operation
+        mock_collection.find_one = AsyncMock(return_value=mock_comments[1])
+        
+        response = client.get("/comments/1")
+        assert response.status_code == 200
+        
+        # Validate response structure
+        assert response.json()["postId"] == 2
+        assert response.json()["name"] == "Post 2"
+        
+        # Verify the database query
+        mock_collection.find_one.assert_awaited_once_with({"id": 1})
+
+# def test_fetch_single_user_not_found():
+#     '''Returns 404 when user doesn't exist'''
+#     with patch('app.routes.users.mongo_connector.mongodb') as mock_mongodb:
+#         # Setup async mock chain
+#         mock_db = AsyncMock()
+#         mock_mongodb.db = mock_db
+        
+#         mock_collection = AsyncMock()
+#         mock_db.__getitem__.return_value = mock_collection
+        
+#         # Mock find_one returning None (user not found)
+#         mock_collection.find_one = AsyncMock(return_value=None)
+        
+#         response = client.get("/users/999")  # Non-existent ID
+#         assert response.status_code == 404
+#         assert response.json()["detail"] == "User not found"
+        
+#         # Verify the database query
+#         mock_collection.find_one.assert_awaited_once_with({"id": 999})
+
+# def test_fetch_list_of_users(mock_users):
+#     '''returns list of users and 200 success'''
+#     with patch('app.routes.users.mongo_connector.mongodb') as mock_mongodb:
+#         # Mock the entire MongoDB chain
+#         mock_db = mock_mongodb.db
+#         mock_collection = mock_db['users']
+        
+#         # Setup method chain for the query
+#         mock_find = mock_collection.find.return_value
+#         mock_sort = mock_find.sort.return_value
+#         mock_limit = mock_sort.limit.return_value
+#         mock_limit.to_list = AsyncMock(return_value=mock_users)
+        
+#         response = client.get("/users")
+#         assert response.status_code == 200
+        
+#         response_data = response.json()
+        
+#         # Verify the structure and count
+#         assert isinstance(response_data, dict)
+#         assert "users" in response_data
+#         assert len(response_data["users"]) == 2
+#         assert response_data["count"] == 2
+#         assert response_data["has_more"] is False
+#         assert response_data["next_cursor"] is None
+        
+#         # Verify first user's basic fields
+#         assert response_data["users"][0]["id"] == 1
+#         assert response_data["users"][0]["name"] == "Walter"
+#         assert response_data["users"][0]["username"] == "Tom"
+        
+#         # Verify second user's basic fields
+#         assert response_data["users"][1]["id"] == 2
+#         assert response_data["users"][1]["name"] == "Wendy"
+#         assert response_data["users"][1]["username"] == "Pete"
+        
+#         # Verify nested structures exist
+#         assert "address" in response_data["users"][0]
+#         assert "company" in response_data["users"][0]
+#         assert "geo" in response_data["users"][0]["address"]
+        
+#         # Verify the MongoDB query was constructed correctly
+#         mock_collection.find.assert_called_once_with({})
+#         mock_find.sort.assert_called_once_with("_id", -1)
+#         mock_sort.limit.assert_called_once_with(21)  # limit + 1 for pagination check
