@@ -80,6 +80,9 @@ async def get_posts(
 @route.get("/posts/{post_id}", response_model=PostModel)
 async def get_single_post(post_id: int):
     try:
+        '''
+        fetches single post by post id
+        '''
         post = await mongo_connector.mongodb.db['posts'].find_one({"id": post_id})
         if not post:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")

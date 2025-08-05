@@ -1,10 +1,12 @@
-#service runs on every application startup
-#after connection to database is established, service checks if time-series collection is present
-#and if it is not empty
-#if it is empty, it checks the CSV directory for CSV files
-#if CSV files are present, it reads them and populates the time-series collection
-#it only takes data from the Dat/Zeit, Wind, and Leistung columns
-#it also uses the filename as the turbine_id
+'''
+service runs on every application startup
+after connection to database is established, service checks if time-series collection is present
+and if it is not empty
+if it is empty, it checks the CSV directory for CSV files
+if CSV files are present, it reads them and populates the time-series collection
+it only takes data from the Dat/Zeit, Wind, and Leistung columns
+it also uses the filename as the turbine_id
+'''
 
 import os
 import csv
@@ -24,6 +26,7 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
     #here, the timestamp is in the format 'dd.mm.yyyy, HH:MM' without seconds, so
     #we need to parse it correctly inclucing the comma
     timestamp = datetime.strptime(row['Dat/Zeit'].strip(), '%d.%m.%Y, %H:%M')
+
     #to handle the case where Leistung or Wind might be empty and also 
     #to convert the comma to a dot for float conversion for consistent values
     #clean up the row data
@@ -33,6 +36,7 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
     external_temperature = float(row['Außen'].replace(',', '.')) if row['Außen'] else 0.0
     internal_temperature = float(row['Lager'].replace(',', '.')) if row['Lager'] else 0.0
     rpm = float(row['Rotor'].replace(',', '.')) if row['Rotor'] else 0.0
+    
     #csv files do not have longitude and latitude, so this is handled here
     #this is a scalability adjustment to allow it to work with a CSV file that has location data
 

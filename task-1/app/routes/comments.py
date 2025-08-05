@@ -75,6 +75,10 @@ async def get_comments(
 @route.get("/comments/{comment_id}", response_model=CommentModel)
 async def get_single_comment(comment_id: int):
     try:
+        '''
+        fetches single comment from the comments collection by comment_id
+        uses the comment_id from json placeholder instead of the ObjectId from mongo
+        '''
         comment = await mongo_connector.mongodb.db["comments"].find_one({"id": comment_id})
         if not comment:
             raise HTTPException(status_code=404, detail="Comment not found")

@@ -12,13 +12,18 @@ class PyObjectId(ObjectId):
     def __get_pydantic_json_schema__(cls, schema, handler):
         return {"type": "string"}
 
-
+'''
+primary posts model
+'''
 class PostModel(BaseModel):
     id: int = Field(..., description="JSONPlaceholder post ID")
     userId: int = Field(..., description="ID of the user who created the post")
     title: str
     body: str
 
+'''
+posts model that allows pagination
+'''
 class PostsResponseModel(BaseModel):
     posts: List[PostModel]
     next_cursor: Optional[str] = None
