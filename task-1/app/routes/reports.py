@@ -81,23 +81,51 @@ async def get_user_reports(
 @route.get("/reports/{user_id}", response_model=UserReportModel)
 async def get_user_report(user_id: int):
     try:
+
         # Fetch user, posts, and comments from the database
-        user = await mongo_connector.mongodb.db['users'].find_one({"id": user_id})
-        if not user:
+               #setup the aggregation pipeline here
+        pipeline = [
+            {
+                #match user ID here and then add the other pipeline valiues as before
+                "$match": {
+                    "id": user_id
+                }
+            },
+            {
+                #join User with their posts and store them in posts 'object'
+                "$lookup": {
+                    "from": "posts",
+                    "localField": "id",
+                    "foreignField": "userId",
+                    "as": "posts"
+                }
+            },
+            {
+                #join user with the comments on their posts, store it as a comments 'object'
+                "$lookup": {
+                    "from": "comments",
+                    "localField": "posts.id",
+                    "foreignField": "postId",
+                    "as": "comments"
+                }
+            },
+            {
+                #count the contents of the 2 objects in the 2 lookup queries
+                "$addFields": {
+                    "posts_count": {"$size": "$posts"},
+                    "comments_count": {"$size": "$comments"}
+                }
+            }
+        ]
+
+        # return users with their data
+        user_data = await mongo_connector.mongodb.db['users'].aggregate(pipeline).to_list(length=1)
+
+        if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
-        posts = await mongo_connector.mongodb.db['posts'].find({"userId": user_id}).to_list(length=None)
-        comments = await mongo_connector.mongodb.db['comments'].find({"postId": {"$in": [post['id'] for post in posts]}}).to_list(length=None)
-        # Process and compile user report
-        report = UserReportModel(
-            id=user['id'],
-            name=user['name'],
-            username=user['username'],
-            posts=[PostSummary(**post) for post in posts],
-            comments=[CommentSummary(**comment) for comment in comments],
-            posts_count=len(posts),
-            comments_count=len(comments)
-        )
-        #no need to check if report is empty because it will always have the user at the minimum
-        return report
+        
+        
+        return UserReportModel(**user_data[0])
+       
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e)) 
