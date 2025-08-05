@@ -45,6 +45,8 @@ async def get_time_series_data(
         if not results:
             return Response(status_code=status.HTTP_204_NO_CONTENT)
         return results
+    except Exception:
+        raise
     except Exception as e:
         logger.error(str(e))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -114,9 +116,10 @@ async def get_power_curve(
                 average_internal_temperature=round(doc["average_internal_temperature"], 2),
                 average_rpm = round(doc["average_rpm"], 2)
             ))
-        if not results:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-        return results
+        
+        return results or []
+    except Exception:
+        raise
     except Exception as ex:
         logger.error(str(ex))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
@@ -129,11 +132,9 @@ async def get_list_turbines():
         turbinelist = await mongo_connector.mongodb.db['time-series-data'].distinct('metadata.turbine_id')
         #to avoid serialisation problems in tests and api calls etcexplicitly  convert result to list
         turbinelist = list(turbinelist)
-        if not turbinelist:
-            #here, to ensure client always knows resource is available but data is empty, we set status to 204
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-        #if successful, 200 is implied anyway, so no need to return json response with specific status code
-        return turbinelist 
+
+        return turbinelist or []
+
     except Exception as e:
         logger.error(str(e))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
