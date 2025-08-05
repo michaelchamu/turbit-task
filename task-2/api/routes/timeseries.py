@@ -9,8 +9,6 @@ import logging
 from mongoconnector import mongo_connector
 from ..models.timeseries import TimeSeriesModel, AggregatedTimeSeriesModel
 
-#TODO setup logger instead of using print statements
-
 route = APIRouter()
 logger = logging.getLogger("task-2")
 
@@ -72,56 +70,56 @@ async def get_power_curve(
             end_date = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
         if start_date >= end_date:
             raise ValueError("start_date must be earlier than end_date.")
-    except ValueError as e:
-        logger.error(str(e))
-        raise HTTPException(status_code=400, detail="Unexpected Error")
+    
+        # Wind speed bins
+        bin_size = 0.5
+        min_wind = 0.0
+        max_wind = 25.0
+        boundaries = [round(min_wind + i * bin_size, 2) for i in range(int((max_wind - min_wind) / bin_size) + 1)]
+        boundaries.append(max_wind + bin_size)
 
-    # Wind speed bins
-    bin_size = 0.5
-    min_wind = 0.0
-    max_wind = 25.0
-    boundaries = [round(min_wind + i * bin_size, 2) for i in range(int((max_wind - min_wind) / bin_size) + 1)]
-    boundaries.append(max_wind + bin_size)
+        match_stage = {"timestamp": {"$gte": start_date, "$lt": end_date}}
+        if turbine_id:
+            match_stage["metadata.turbine_id"] = turbine_id
 
-    match_stage = {"timestamp": {"$gte": start_date, "$lt": end_date}}
-    if turbine_id:
-        match_stage["metadata.turbine_id"] = turbine_id
-
-    pipeline = [
-        {"$match": match_stage},
-        {
-            "$bucket": {
-                "groupBy": "$wind_speed",
-                "boundaries": boundaries,
-                "default": "out_of_range",
-                "output": {
-                    "average_power": {"$avg": "$power"},
-                    "avg_wind_speed": {"$avg": "$wind_speed"},
-                    "avg_azimuth": {"$avg": "$metadata.azimuth"},
-                    "average_external_temperature": {"$avg": "$metadata.external_temperature" },
-                    "average_internal_temperature": {"$avg": "$metadata.internal_temperature"},
-                    "average_rpm": {"$avg": "$metadata.rpm"},
-                    "count": {"$sum": 1}
+        pipeline = [
+            {"$match": match_stage},
+            {
+                "$bucket": {
+                    "groupBy": "$wind_speed",
+                    "boundaries": boundaries,
+                    "default": "out_of_range",
+                    "output": {
+                        "average_power": {"$avg": "$power"},
+                        "avg_wind_speed": {"$avg": "$wind_speed"},
+                        "avg_azimuth": {"$avg": "$metadata.azimuth"},
+                        "average_external_temperature": {"$avg": "$metadata.external_temperature" },
+                        "average_internal_temperature": {"$avg": "$metadata.internal_temperature"},
+                        "average_rpm": {"$avg": "$metadata.rpm"},
+                        "count": {"$sum": 1}
+                    }
                 }
-            }
-        },
-        {"$match": {"_id": {"$ne": "out_of_range"}}},
-        {"$sort": {"_id": 1}}
-    ]
+            },
+            {"$match": {"_id": {"$ne": "out_of_range"}}},
+            {"$sort": {"_id": 1}}
+        ]
 
-    results = []
-    async for doc in mongo_connector.mongodb.db['time-series-data'].aggregate(pipeline):
-        results.append(AggregatedTimeSeriesModel(
-            average_wind_speed=round(doc["avg_wind_speed"], 2),
-            average_power=round(doc["average_power"], 2),
-            average_azimuth=round(doc["avg_azimuth"], 2),
-            average_external_temperature=round(doc["average_external_temperature"], 2),
-            average_internal_temperature=round(doc["average_internal_temperature"], 2),
-            average_rpm = round(doc["average_rpm"], 2)
-        ))
-    if not results:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
-    return results
+        results = []
+        async for doc in mongo_connector.mongodb.db['time-series-data'].aggregate(pipeline):
+            results.append(AggregatedTimeSeriesModel(
+                average_wind_speed=round(doc["avg_wind_speed"], 2),
+                average_power=round(doc["average_power"], 2),
+                average_azimuth=round(doc["avg_azimuth"], 2),
+                average_external_temperature=round(doc["average_external_temperature"], 2),
+                average_internal_temperature=round(doc["average_internal_temperature"], 2),
+                average_rpm = round(doc["average_rpm"], 2)
+            ))
+        if not results:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return results
+    except Exception as ex:
+        logger.error(str(ex))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
 
 #use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db
 @route.get("/turbines", response_model=List[str])
