@@ -1,42 +1,76 @@
-from fastapi import APIRouter, HTTPException, status, Response
+from fastapi import APIRouter, HTTPException, Query, status, Response
 from typing import List
-
+import logging
 from fastapi.responses import JSONResponse
 from mongoconnector import mongo_connector
 from ..models.report import CommentSummary, PostSummary, UserReportModel
 
 route = APIRouter()
+logger = logging.getLogger("task-1")
 
 @route.get("/reports", response_model=List[UserReportModel])
-async def get_user_reports():
+async def get_user_reports(
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=100)
+):
     try:
-        # Fetch users, posts, and comments from the database
-        users = await mongo_connector.mongodb.db['users'].find().to_list(length=None)
-        posts = await mongo_connector.mongodb.db['posts'].find().to_list(length=None)
-        comments = await mongo_connector.mongodb.db['comments'].find().to_list(length=None)
+        '''
+        Fetches list of users, their posts and comments to their posts
+        Instead of pulling all values frokm db into memory, it uses mongo pipelines
+        for better memory management and also handles pagination by default
+        '''
+        skip = (page - 1) * limit
 
-        # Process and compile user reports
-        user_reports = []
-        for user in users:
-            user_posts = [post for post in posts if post['userId'] == user['id']]
-            user_post_ids = [p['id'] for p in user_posts]
-            user_comments = [comment for comment in comments if comment['postId'] in user_post_ids]
-            report = UserReportModel(
+        #setup the aggregation pipeline here
+        pipeline = [
+            {"$skip": skip},
+            {"$limit": limit},
+            {
+                "$lookup": {
+                    "from": "posts",
+                    "localField": "id",
+                    "foreignField": "userId",
+                    "as": "posts"
+                }
+            },
+            {
+                "$lookup": {
+                    "from": "comments",
+                    "localField": "posts.id",
+                    "foreignField": "postId",
+                    "as": "comments"
+                }
+            },
+            {
+                "$addFields": {
+                    "posts_count": {"$size": "$posts"},
+                    "comments_count": {"$size": "$comments"}
+                }
+            }
+        ]
+
+        # return users with their data
+        users_data = await mongo_connector.mongodb.db['users'].aggregate(pipeline).to_list(length=None)
+
+        if not users_data:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+        reports = [
+            UserReportModel(
                 id=user['id'],
                 name=user['name'],
                 username=user['username'],
-                posts=[PostSummary(**post) for post in user_posts],
-                comments=[CommentSummary(**comment) for comment in user_comments],
-                posts_count=len(user_posts),
-                comments_count=len(user_comments)
+                posts=[PostSummary(**post) for post in user['posts']],
+                comments=[CommentSummary(**comment) for comment in user['comments']],
+                posts_count=user['posts_count'],
+                comments_count=user['comments_count']
             )
-            user_reports.append(report)
-        # If there are no users, return 204 No Content
-        if not users:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-        return user_reports
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e))
+            for user in users_data
+        ]
+        
+        return reports
+    except Exception as ex:
+        logger.error(str(ex))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error.")
     
 #this route fetches a report for a specific user by their ID
 @route.get("/reports/{user_id}", response_model=UserReportModel)
