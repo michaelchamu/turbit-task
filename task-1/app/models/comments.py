@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, EmailStr
-from typing import Optional
+from typing import List, Optional
 from bson import ObjectId
 
 
@@ -20,3 +20,9 @@ class CommentModel(BaseModel):
     name: str
     email: EmailStr
     body: str
+
+class CommentsResponseModel(BaseModel):
+    comments: List[CommentModel]
+    next_cursor: Optional[str] = None
+    has_more: bool
+    count: int
