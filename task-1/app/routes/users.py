@@ -64,7 +64,8 @@ async def get_users(
             count=len(users_list)
         )
         return result
-    
+    except Exception:
+        raise
     except Exception as ex:
         logger.error(str(ex))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal error")
@@ -76,6 +77,8 @@ async def get_single_user(user_id: int):
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
         return user
+    except Exception:
+        raise
     except Exception as e:
          logger.error(str(e))
          raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error.") 
