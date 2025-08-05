@@ -1,11 +1,16 @@
 from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI #get the FastAPI and other modules from it
 from mongoconnector import mongo_connector #import the MongoDB connection functions
+import logging
+from customlogger import customlogger
 from .services import populate_db
 from .routes import users, posts, comments, reports #import all defined routes
 
 from dotenv import load_dotenv
 import os
+
+customlogger.setup_logging()
+logger = logging.getLogger("task-1")
 
 load_dotenv()
 #When the application starts, connect to MongoDB uisng lifespan context manager
