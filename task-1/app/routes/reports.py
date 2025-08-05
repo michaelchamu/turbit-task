@@ -73,6 +73,9 @@ async def get_user_reports(
         ]
         
         return reports
+    #catch any other exceptions and raise them again
+    except Exception:
+        raise
     except Exception as ex:
         logger.error(str(ex))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error.")
@@ -130,7 +133,7 @@ async def get_user_report(user_id: int):
 
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
-        
+        #return result as userreport model, doesnt include
         return UserReportModel(**user_data[0])
     
     #to ensure that the 404 is returned to client correctly instead of a generic 500 raise the exception again
