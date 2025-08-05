@@ -2,7 +2,9 @@
 import logging
 from logging.config import dictConfig
 import colorlog
-
+'''
+Use the same logs config across multiple pojects in the same directory
+'''
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": False,
