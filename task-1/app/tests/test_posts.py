@@ -42,7 +42,7 @@ def test_fetch_posts_empty():
         mock_find.sort.assert_called_once_with("_id", -1)
         mock_sort.limit.assert_called_once_with(21)  # limit + 1 for pagination check
 
-def test_fetch_single_comment(mock_posts: any):
+def test_fetch_single_post(mock_posts: any):
     '''Fetches single comment with correct id'''
     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
          # Setup async mock chain
@@ -65,25 +65,25 @@ def test_fetch_single_comment(mock_posts: any):
         # Verify the database query
         mock_collection.find_one.assert_awaited_once_with({"id": 1})
 
-# def test_fetch_single_comment_not_found():
-#     '''Returns 404 when comment doesn't exist'''
-#     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
-#         # Setup async mock chain
-#         mock_db = AsyncMock()
-#         mock_mongodb.db = mock_db
+def test_fetch_single_post_not_found():
+    '''Returns 404 when comment doesn't exist'''
+    with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
+        # Setup async mock chain
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
         
-#         mock_collection = AsyncMock()
-#         mock_db.__getitem__.return_value = mock_collection
+        mock_collection = AsyncMock()
+        mock_db.__getitem__.return_value = mock_collection
         
-#         # Mock find_one returning None (user not found)
-#         mock_collection.find_one = AsyncMock(return_value=None)
+        # Mock find_one returning None (post not found)
+        mock_collection.find_one = AsyncMock(return_value=None)
         
-#         response = client.get("/posts/999")  # Non-existent ID
-#         assert response.status_code == 404
-#         assert response.json()["detail"] == "Comment not found"
+        response = client.get("/posts/999")  # Non-existent ID
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Post not found"
         
-#         # Verify the database query
-#         mock_collection.find_one.assert_awaited_once_with({"id": 999})
+        # Verify the database query
+        mock_collection.find_one.assert_awaited_once_with({"id": 999})
 
 # def test_fetch_list_of_posts(mock_posts: any):
 #     '''returns list of posts and 200 success'''
