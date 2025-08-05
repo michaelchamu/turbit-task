@@ -79,6 +79,8 @@ async def get_single_comment(comment_id: int):
         if not comment:
             raise HTTPException(status_code=404, detail="Comment not found")
         return comment
+    except Exception:
+        raise
     except Exception as e:
         logger.error(str(e))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error ") 
