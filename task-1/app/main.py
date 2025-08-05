@@ -13,14 +13,16 @@ customlogger.setup_logging()
 logger = logging.getLogger("task-1")
 
 load_dotenv()
-'''When the application starts, connect to MongoDB uisng lifespan context manager
+'''
+When the application starts, connect to MongoDB uisng lifespan context manager
 When the application stops, close the MongoDB connection
 This ensures that the database connection is properly managed throughout the application's lifecycle
 The lifespan context manager allows for setup and teardown operations around the application lifecycle
 This is useful for managing resources like database connections, ensuring they are opened when the app starts
 and closed when the app stops, preventing resource leaks and ensuring clean shutdowns.
 when application starts, and connects to MongoDB, Check if the 3 required collections exist.
-if they dont exist, create them and populate them with data from the JSON Placeholder API.'''
+if they dont exist, create them and populate them with data from the JSON Placeholder API.
+'''
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
