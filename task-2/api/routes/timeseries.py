@@ -78,7 +78,7 @@ async def get_power_curve(
             start_date = datetime.strptime('01.01.2016, 00:00', '%d.%m.%Y, %H:%M')
             end_date = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
         if start_date >= end_date:
-            raise ValueError("start_date must be earlier than end_date.")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="start_date must be earlier than end_date.")
     
         # Wind speed bins
         bin_size = 0.5
