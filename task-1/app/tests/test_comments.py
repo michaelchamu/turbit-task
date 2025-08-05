@@ -65,25 +65,25 @@ def test_fetch_single_comment(mock_comments: any):
         # Verify the database query
         mock_collection.find_one.assert_awaited_once_with({"id": 1})
 
-# def test_fetch_single_user_not_found():
-#     '''Returns 404 when user doesn't exist'''
-#     with patch('app.routes.users.mongo_connector.mongodb') as mock_mongodb:
-#         # Setup async mock chain
-#         mock_db = AsyncMock()
-#         mock_mongodb.db = mock_db
+def test_fetch_single_user_not_found():
+    '''Returns 404 when comment doesn't exist'''
+    with patch('app.routes.users.mongo_connector.mongodb') as mock_mongodb:
+        # Setup async mock chain
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
         
-#         mock_collection = AsyncMock()
-#         mock_db.__getitem__.return_value = mock_collection
+        mock_collection = AsyncMock()
+        mock_db.__getitem__.return_value = mock_collection
         
-#         # Mock find_one returning None (user not found)
-#         mock_collection.find_one = AsyncMock(return_value=None)
+        # Mock find_one returning None (user not found)
+        mock_collection.find_one = AsyncMock(return_value=None)
         
-#         response = client.get("/users/999")  # Non-existent ID
-#         assert response.status_code == 404
-#         assert response.json()["detail"] == "User not found"
+        response = client.get("/comments/999")  # Non-existent ID
+        assert response.status_code == 404
+        assert response.json()["detail"] == "Comment not found"
         
-#         # Verify the database query
-#         mock_collection.find_one.assert_awaited_once_with({"id": 999})
+        # Verify the database query
+        mock_collection.find_one.assert_awaited_once_with({"id": 999})
 
 # def test_fetch_list_of_users(mock_users):
 #     '''returns list of users and 200 success'''
