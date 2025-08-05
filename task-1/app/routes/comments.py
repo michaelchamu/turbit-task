@@ -81,7 +81,7 @@ async def get_single_comment(comment_id: int):
         '''
         comment = await mongo_connector.mongodb.db["comments"].find_one({"id": comment_id})
         if not comment:
-            raise HTTPException(status_code=404, detail="Comment not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
         return comment
     except Exception:
         raise
