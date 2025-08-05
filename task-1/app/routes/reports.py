@@ -57,8 +57,6 @@ async def get_user_reports(
         # return users with their data
         users_data = await mongo_connector.mongodb.db['users'].aggregate(pipeline).to_list(length=None)
 
-        if not users_data:
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
         reports = [
             UserReportModel(
                 id=user['id'],
@@ -134,7 +132,16 @@ async def get_user_report(user_id: int):
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
         #return result as userreport model, doesnt include
-        return UserReportModel(**user_data[0])
+        user = user_data[0]
+        return UserReportModel(
+            id=user['id'],
+            name=user['name'],
+            username=user['username'],
+            posts=[PostSummary(**post) for post in user['posts']],
+            comments=[CommentSummary(**comment) for comment in user['comments']],
+            posts_count=user['posts_count'],
+            comments_count=user['comments_count']
+        )
     
     #to ensure that the 404 is returned to client correctly instead of a generic 500 raise the exception again
     except HTTPException:
