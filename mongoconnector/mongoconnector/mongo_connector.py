@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
-
+'''
+use the same mongo connection file across all projects in the directory
+'''
 #fetch environment variables
 database_url = os.getenv("MONGO_URI")
 database_port = os.getenv("MONGO_PORT")
