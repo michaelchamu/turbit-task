@@ -13,10 +13,11 @@ from datetime import datetime
 from motor.motor_asyncio import AsyncIOMotorClient
 from pathlib import Path
 from ..models.timeseries import TimeSeriesModel, TurbineMetadata
-
+import logging
 csv_data_path = Path(__file__).resolve().parents[3].joinpath("data/csv/")
 
 collection_name = "time-series-data"
+logger = logging.getLogger("task-2")
 
 #iterate through a selected CSV file and create a TimeSeriesModel document for each row
 def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
@@ -70,11 +71,11 @@ async def create_time_series_collection(db: AsyncIOMotorClient):
                     'granularity': 'minutes'
                 }
             )
-            print(f"Time-series collection '{collection_name}' created successfully.")
+            logger.info(f"Time-series collection '{collection_name}' created successfully.")
         else:
-            print(f"Time-series collection '{collection_name}' already exists.")
+            logger.info(f"Time-series collection '{collection_name}' already exists.")
     except Exception as e:
-        print(f"An error occurred while creating the time-series collection: {e}")
+        logger.error(f"An error occurred while creating the time-series collection: {e}")
         raise e
     
 
@@ -88,7 +89,7 @@ async def populate_time_series(db: AsyncIOMotorClient):
         document_count = await db[collection_name].count_documents({})
 
         if document_count == 0:
-            print(f"Collection {collection_name} is empty. Populating it from CSV files.")
+            logger.info(f"Collection {collection_name} is empty. Populating it from CSV files.")
             #check if the CSV data directory exists
             if not os.path.exists(csv_data_path):
                 raise FileNotFoundError(f"CSV directory {csv_data_path} does not exist.")
@@ -102,7 +103,7 @@ async def populate_time_series(db: AsyncIOMotorClient):
             for csv_file in csv_files:
                 file_path = os.path.join(csv_data_path, csv_file)
                 turbine_id = Path(csv_file).stem  # extract filename and remove extension to use as turbine_id
-                print(f"Processing file: {csv_file} with turbine_id: {turbine_id}")
+                logger.info(f"Processing file: {csv_file} with turbine_id: {turbine_id}")
 
                 #Files have more than 10k lines, so to be safe with memory issues, perfomance
                 #and mongo batch insert, read the data in chunks
@@ -126,16 +127,16 @@ async def populate_time_series(db: AsyncIOMotorClient):
                                 #print(f"Inserted {len(batch)} documents into {collection_name}.")
                                 batch.clear()
                         except Exception as e:
-                            print(f"Skipping row due to error: {e}")
+                            logger.info(f"Skipping row due to error: {e}")
                             continue
                     #we are chuncking in multiples of 1000
                     #some documents may remain, so insert them here
                     if batch:
                         await db[collection_name].insert_many(batch)
-                        print(f"Inserted remaining {len(batch)} documents into {collection_name}.")
+                        logger.info(f"Inserted remaining {len(batch)} documents into {collection_name}.")
 
-                print(f"Populated {collection_name} collection with data from {len(csv_files)} CSV files.")
+                logger.info(f"Populated {collection_name} collection with data from {len(csv_files)} CSV files.")
             else:
-                print(f"{collection_name} collection already exists and is not empty. No action taken.")
+                logger.info(f"{collection_name} collection already exists and is not empty. No action taken.")
     except Exception as e:
-        print(f"An error occurred while populating the time-series data: {e}")
+        logger.error(f"An error occurred while populating the time-series data: {e}")
