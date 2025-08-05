@@ -20,7 +20,7 @@ class PostModel(BaseModel):
     body: str
 
 class PostsResponseModel(BaseModel):
-    comments: List[PostModel]
+    posts: List[PostModel]
     next_cursor: Optional[str] = None
     has_more: bool
     count: int
