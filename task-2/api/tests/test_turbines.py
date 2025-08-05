@@ -61,6 +61,8 @@ def test_fetch_all_turbines(mock_turbines: any):
         # Verify response
         assert response.status_code == 200
         assert response.json() == mock_turbines
+        response_data = response.json()
+        response_data[0] = "Turbine 1"
         
         # Verify database call
         mock_collection.distinct.assert_awaited_once_with('metadata.turbine_id')
