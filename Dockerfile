@@ -16,6 +16,9 @@ COPY . .
 # Install the shared mongo connector package
 RUN cd mongoconnector && pip install . --no-cache-dir
 
+#install the shared custom logger package
+RUN cd customlogger && pip install . --no-cache-dir
+
 # Install requirements for both applications
 RUN pip install --no-cache-dir --upgrade pip && \
     if [ -f requirements.txt ]; then pip install --no-cache-dir -r requirements.txt; fi && \
