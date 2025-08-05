@@ -18,6 +18,20 @@ async def get_comments(
     None
     )):
     try:
+        '''
+        Fetches all comments from database.
+        To cater for potential increases in number of documents, I use a cursor
+        to fetch a limited number of records.
+        Client side can then paginate to only access a small number of docs.
+        I use the ObjectId of the last post from the previous batch.
+
+        Args:
+            cursor:
+            limit: total number of posts to return
+            comment_id:
+        Returns:
+            CommentsReturnModel: Object with a list of comments, id of next cursor etc.
+        '''
         query_filter = {}
 
         if comment_id is not None:

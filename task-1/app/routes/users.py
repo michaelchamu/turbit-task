@@ -16,6 +16,20 @@ async def get_users(
     post_id: Optional[int] = Query(None)
     ):
     try:
+        '''
+        Fetches all users from database.
+        To cater for potential increases in number of documents, I use a cursor
+        to fetch a limited number of records.
+        Client side can then paginate to only access a small number of docs.
+        I use the ObjectId of the last post from the previous batch.
+
+        Args:
+            cursor:
+            limit: total number of posts to return
+            users_id:
+        Returns:
+            UsersReturnModel: Object with a list of users, id of next cursor etc.
+        '''
         query_filter = {}
 
         if post_id is not None:
