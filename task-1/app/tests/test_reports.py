@@ -57,7 +57,7 @@ def test_fetch_single_report(mock_reports: any):
     '''Fetches single comment with correct id'''
     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
         
-# Setup base mock
+        # Setup base mock
         mock_db = AsyncMock()
         mock_mongodb.db = mock_db
 
@@ -120,44 +120,45 @@ def test_fetch_single_report_not_found():
         # Verify the database query
         mock_users_collection.count_documents.assert_awaited_once_with({"id": 999}, limit=1)
 
-# def test_fetch_list_of_posts(mock_posts: any):
-#     '''returns list of posts and 200 success'''
-#     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
-#         # Mock the entire MongoDB chain
-#         mock_db = mock_mongodb.db
-#         mock_collection = mock_db['posts']
+def test_fetch_list_of_reports(mock_reports: any):
+    '''returns list of posts and 200 success'''
+    with patch('app.routes.reports.mongo_connector.mongodb') as mock_mongodb:
+# Setup base mock
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
+
+        # Mock users collection
+        mock_users = AsyncMock()
+        mock_db.__getitem__.return_value = mock_users
         
-#         # Setup method chain for the query
-#         mock_find = mock_collection.find.return_value
-#         mock_sort = mock_find.sort.return_value
-#         mock_limit = mock_sort.limit.return_value
-#         mock_limit.to_list = AsyncMock(return_value=mock_posts)
+        # Mock count_documents (user exists check)
+        mock_users.count_documents = AsyncMock(return_value=1)
         
-#         response = client.get("/posts")
-#         assert response.status_code == 200
+        # Mock the cursor returned by aggregate
+        mock_cursor = MagicMock()
+        mock_cursor.to_list = AsyncMock(return_value=mock_reports)
+        mock_users.aggregate = MagicMock(return_value=mock_cursor)
         
-#         response_data = response.json()
+        # Make request
+        response = client.get("/reports")
         
-#         # Verify the structure and count
-#         assert isinstance(response_data, dict)
-#         assert "posts" in response_data
-#         assert len(response_data["posts"]) == 2
-#         assert response_data["count"] == 2
-#         assert response_data["has_more"] is False
-#         assert response_data["next_cursor"] is None
+        # Verify response
+        assert response.status_code == 200
+        response_data = response.json()
         
-#         # Verify first user's basic fields
-#         assert response_data["posts"][0]["id"] == 1
-#         assert response_data["posts"][0]["userId"] == 1
-#         assert response_data["posts"][0]["body"] == "Wow"
-#         assert response_data["posts"][0]["title"] == "Post 1"
+        # Check values
+        assert response_data[0]["id"] == 1
+        assert response_data[0]["name"] == "Tom"
+        assert response_data[0]["username"] == "tom34"
+        assert len(response_data[0]["posts"]) == 2
+        assert len(response_data[0]["comments"]) == 3
+        assert response_data[0]["posts_count"] == 2
+        assert response_data[0]["comments_count"] == 3
         
-#         # Verify second user's basic fields
-#         assert response_data["posts"][1]["id"] == 2
-#         assert response_data["posts"][1]["userId"] == 2
-#         assert response_data["posts"][1]["body"] == "Noo"
-#         assert response_data["posts"][1]["title"] == "Post 2"
-#         # Verify the MongoDB query was constructed correctly
-#         mock_collection.find.assert_called_once_with({})
-#         mock_find.sort.assert_called_once_with("_id", -1)
-#         mock_sort.limit.assert_called_once_with(21)  # limit + 1 for pagination check
+        # Verify database call structure
+        mock_users.aggregate.assert_called_once()
+
+        pipeline = mock_users.aggregate.call_args[0][0]  
+        assert any(stage.get("$lookup", {}).get("from") == "posts" for stage in pipeline)
+        assert any(stage.get("$lookup", {}).get("from") == "comments" for stage in pipeline)
+        assert any("$addFields" in stage for stage in pipeline)
