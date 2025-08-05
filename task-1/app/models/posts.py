@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import List, Optional
 from bson import ObjectId
 
 class PyObjectId(ObjectId):
@@ -18,3 +18,9 @@ class PostModel(BaseModel):
     userId: int = Field(..., description="ID of the user who created the post")
     title: str
     body: str
+
+class PostsResponseModel(BaseModel):
+    comments: List[PostModel]
+    next_cursor: Optional[str] = None
+    has_more: bool
+    count: int
