@@ -78,7 +78,7 @@ async def get_single_user(user_id: int):
         '''
         user = await mongo_connector.mongodb.db['users'].find_one({"id": user_id})
         if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
         return user
     except Exception:
         raise
