@@ -82,8 +82,15 @@ async def get_user_reports(
 async def get_user_report(user_id: int):
     try:
 
-        # Fetch user, posts, and comments from the database
-               #setup the aggregation pipeline here
+        '''
+        Fetch user, posts, and comments from the database with a pipeline
+        uses a pipeline again which matches the user_id parameter
+        '''
+        #already check if user exists before we run the query
+        user_exists = await mongo_connector.mongodb.db['users'].count_documents({"id": user_id}, limit=1)
+        if not user_exists:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        #setup the aggregation pipeline here
         pipeline = [
             {
                 #match user ID here and then add the other pipeline valiues as before
@@ -124,8 +131,11 @@ async def get_user_report(user_id: int):
         if not user_data:
             raise HTTPException(status_code=404, detail="User not found")
         
-        
         return UserReportModel(**user_data[0])
-       
+    
+    #to ensure that the 404 is returned to client correctly instead of a generic 500 raise the exception again
+    except HTTPException:
+        raise   
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error: " + str(e)) 
+        logger.error(str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error") 
