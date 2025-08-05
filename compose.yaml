@@ -42,7 +42,7 @@ services:
     container_name: turbit-task1
     restart: always
     ports:
-      - "6060:6060"
+      - "6000:6000"
     env_file:
       - .env
     depends_on:
@@ -58,7 +58,7 @@ services:
     container_name: turbit-task2
     restart: always
     ports:
-      - "7070:7070"
+      - "7000:7000"
     env_file:
       - .env
     depends_on:

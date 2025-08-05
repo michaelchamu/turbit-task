@@ -29,10 +29,10 @@ RUN pip install --no-cache-dir --upgrade pip && \
 FROM base as task1
 WORKDIR /app/turbit-apis/task-1
 EXPOSE 6000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "6060"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "6000"]
 
 # Stage for Task 2
 FROM base as task2
 WORKDIR /app/turbit-apis/task-2
 EXPOSE 7000
-CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7070"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "7000"]

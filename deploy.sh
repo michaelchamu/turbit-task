@@ -44,8 +44,8 @@ docker-compose ps
 # Display service URLs
 echo ""
 echo "Service URLs:"
-echo "  Task 1 API: http://localhost:6060"
-echo "  Task 2 API: http://localhost:7070"
+echo "  Task 1 API: http://localhost:6000"
+echo "  Task 2 API: http://localhost:7000"
 echo "  MongoDB: mongodb://localhost:27017"
 echo ""
 echo "Deployment complete!"
