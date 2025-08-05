@@ -1,0 +1,15 @@
+[project]
+name = "customlogger"
+version = "0.1.0"
+description = "Reusable logger config for FastAPI projects"
+authors = [{ name = "Michael Chamunorwa", email = "you@example.com" }]
+dependencies = [
+    "logger",
+    "python-dotenv",
+    "colorlog"
+]
+requires-python = ">=3.8"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
