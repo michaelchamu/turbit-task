@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, Response, status
 from typing import List, Optional
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
@@ -42,15 +42,10 @@ async def get_time_series_data(
         #this adjustment allows for more flexible querying using a cursor from MongoDB
         cursor = mongo_connector.mongodb.db['time-series-data'].find(query).sort('timestamp', ASCENDING).limit(limit)
         results = await cursor.to_list(length=limit)
-
-        # Convert the fetched data to TimeSeriesModel instances
         #return with status code to make it easier client side to handle different actions
         #not adding status 200 because it will be returned in any case on success but must make distinction on 204(empty)
         if not results:
-            return JSONResponse(
-                status_code=status.HTTP_204_NO_CONTENT,
-                content=[]
-            )
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
         return results
     except Exception as e:
         logger.error(str(e))
@@ -78,7 +73,8 @@ async def get_power_curve(
         if start_date >= end_date:
             raise ValueError("start_date must be earlier than end_date.")
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.error(str(e))
+        raise HTTPException(status_code=400, detail="Unexpected Error")
 
     # Wind speed bins
     bin_size = 0.5
@@ -124,10 +120,7 @@ async def get_power_curve(
             average_rpm = round(doc["average_rpm"], 2)
         ))
     if not results:
-        return JSONResponse(
-            status_code=status.HTTP_204_NO_CONTENT,
-            content=[]
-        )
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     return results
 
 #use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db
@@ -140,10 +133,9 @@ async def get_list_turbines():
         turbinelist = list(turbinelist)
         if not turbinelist:
             #here, to ensure client always knows resource is available but data is empty, we set status to 204
-            return JSONResponse(
-                status_code=status.HTTP_204_NO_CONTENT,
-                content=[]
-            )
-        return turbinelist #if successful, 200 is implied anyway, so no need to return json response with specific status code
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+        #if successful, 200 is implied anyway, so no need to return json response with specific status code
+        return turbinelist 
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        logger.error(str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unexpected error")
