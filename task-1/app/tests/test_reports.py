@@ -8,7 +8,8 @@ client = TestClient(app)
 
 comments = [
             {"_id": ObjectId(), "id": 1, "postId":"1", "name": "Post 1", "email": "ddd@rrr.com", "body":"Wow"},
-            {"_id": ObjectId(), "id": 2, "postId":"2", "name": "Post 2", "email": "dsss@rrr.com", "body":"Noo"}
+            {"_id": ObjectId(), "id": 2, "postId":"2", "name": "Post 2", "email": "dsss@rrr.com", "body":"Noo"},
+             {"_id": ObjectId(), "id": 2, "postId":"2", "name": "Post 2", "email": "dsss@rrr.com", "body":"Noo"}
 ]
 
 posts = [
@@ -19,8 +20,8 @@ posts = [
 @pytest.fixture
 def mock_reports():
     return [
-        {"_id": ObjectId(), "id": 1, "name":"Tom", "username": "tom34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 2 },
-        {"_id": ObjectId(), "id": 2, "name":"Adam", "username": "adam34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 2}
+        {"_id": ObjectId(), "id": 1, "name":"Tom", "username": "tom34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 3 },
+        {"_id": ObjectId(), "id": 2, "name":"Adam", "username": "adam34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 3}
     ]
 
 
@@ -84,9 +85,9 @@ def test_fetch_single_report(mock_reports: any):
         assert response_data["name"] == "Tom"
         assert response_data["username"] == "tom34"
         assert len(response_data["posts"]) == 2
-        assert len(response_data["comments"]) == 2
+        assert len(response_data["comments"]) == 3
         assert response_data["posts_count"] == 2
-        assert response_data["comments_count"] == 2
+        assert response_data["comments_count"] == 3
         
         # Verify database call structure
         mock_users.count_documents.assert_awaited_once_with({"id": 1}, limit=1)
