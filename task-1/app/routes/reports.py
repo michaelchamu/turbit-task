@@ -18,6 +18,8 @@ async def get_user_reports(
         Fetches list of users, their posts and comments to their posts
         Instead of pulling all values frokm db into memory, it uses mongo pipelines
         for better memory management and also handles pagination by default
+
+        sending page and limit will cause pagination from out the box
         '''
         skip = (page - 1) * limit
 
@@ -26,6 +28,7 @@ async def get_user_reports(
             {"$skip": skip},
             {"$limit": limit},
             {
+                #join User with their posts and store them in posts 'object'
                 "$lookup": {
                     "from": "posts",
                     "localField": "id",
@@ -34,6 +37,7 @@ async def get_user_reports(
                 }
             },
             {
+                #join user with the comments on their posts, store it as a comments 'object'
                 "$lookup": {
                     "from": "comments",
                     "localField": "posts.id",
@@ -42,6 +46,7 @@ async def get_user_reports(
                 }
             },
             {
+                #count the contents of the 2 objects in the 2 lookup queries
                 "$addFields": {
                     "posts_count": {"$size": "$posts"},
                     "comments_count": {"$size": "$comments"}
