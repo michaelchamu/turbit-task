@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from bson import ObjectId
 from fastapi.testclient import TestClient
 import pytest
@@ -19,8 +19,8 @@ posts = [
 @pytest.fixture
 def mock_reports():
     return [
-        {"_id": ObjectId(), "id": 1, "name":"Tom", "username": "tom34", "posts": posts, "comments": comments },
-        {"_id": ObjectId(), "id": 2, "name":"Adam", "username": "adam34", "posts": posts, "comments": comments}
+        {"_id": ObjectId(), "id": 1, "name":"Tom", "username": "tom34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 2 },
+        {"_id": ObjectId(), "id": 2, "name":"Adam", "username": "adam34", "posts": posts, "comments": comments, "posts_count": 2, "comments_count": 2}
     ]
 
 
@@ -52,48 +52,72 @@ def test_fetch_reports_empty():
         assert any('$lookup' in stage for stage in pipeline_stages)
         assert any('$addFields' in stage for stage in pipeline_stages)
 
-# def test_fetch_single_post(mock_posts: any):
-#     '''Fetches single comment with correct id'''
-#     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
-#          # Setup async mock chain
-#         mock_db = AsyncMock()
-#         mock_mongodb.db = mock_db
+def test_fetch_single_report(mock_reports: any):
+    '''Fetches single comment with correct id'''
+    with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
         
-#         mock_collection = AsyncMock()
-#         mock_db.__getitem__.return_value = mock_collection
-        
-#         # Mock the async find_one operation
-#         mock_collection.find_one = AsyncMock(return_value=mock_posts[1])
-        
-#         response = client.get("/posts/1")
-#         assert response.status_code == 200
-        
-#         # Validate response structure
-#         assert response.json()["userId"] == 2
-#         assert response.json()["title"] == "Post 2"
-        
-#         # Verify the database query
-#         mock_collection.find_one.assert_awaited_once_with({"id": 1})
+# Setup base mock
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
 
-# def test_fetch_single_post_not_found():
-#     '''Returns 404 when comment doesn't exist'''
-#     with patch('app.routes.posts.mongo_connector.mongodb') as mock_mongodb:
-#         # Setup async mock chain
-#         mock_db = AsyncMock()
-#         mock_mongodb.db = mock_db
+        # Mock users collection
+        mock_users = AsyncMock()
+        mock_db.__getitem__.return_value = mock_users
         
-#         mock_collection = AsyncMock()
-#         mock_db.__getitem__.return_value = mock_collection
+        # Mock count_documents (user exists check)
+        mock_users.count_documents = AsyncMock(return_value=1)
         
-#         # Mock find_one returning None (post not found)
-#         mock_collection.find_one = AsyncMock(return_value=None)
+        # Mock the cursor returned by aggregate
+        mock_cursor = MagicMock()
+        mock_cursor.to_list = AsyncMock(return_value=[mock_reports[0]])
+        mock_users.aggregate = MagicMock(return_value=mock_cursor)
         
-#         response = client.get("/posts/999")  # Non-existent ID
-#         assert response.status_code == 404
-#         assert response.json()["detail"] == "Post not found"
+        # Make request
+        response = client.get("/reports/1")
         
-#         # Verify the database query
-#         mock_collection.find_one.assert_awaited_once_with({"id": 999})
+        # Verify response
+        assert response.status_code == 200
+        response_data = response.json()
+        
+        # Check values
+        assert response_data["id"] == 1
+        assert response_data["name"] == "Tom"
+        assert response_data["username"] == "tom34"
+        assert len(response_data["posts"]) == 2
+        assert len(response_data["comments"]) == 2
+        assert response_data["posts_count"] == 2
+        assert response_data["comments_count"] == 2
+        
+        # Verify database call structure
+        mock_users.count_documents.assert_awaited_once_with({"id": 1}, limit=1)
+        mock_users.aggregate.assert_called_once()
+
+        pipeline = mock_users.aggregate.call_args[0][0]
+        assert {"$match": {"id": 1}} in pipeline
+        assert any(stage.get("$lookup", {}).get("from") == "posts" for stage in pipeline)
+        assert any(stage.get("$lookup", {}).get("from") == "comments" for stage in pipeline)
+        assert any("$addFields" in stage for stage in pipeline)
+
+def test_fetch_single_report_not_found():
+    '''Returns 404 when user doesn't exist'''
+    with patch('app.routes.reports.mongo_connector.mongodb') as mock_mongodb:
+        # Setup async mock chain
+        mock_db = AsyncMock()
+        mock_mongodb.db = mock_db
+        
+        # Mock users collection
+        mock_users_collection = AsyncMock()
+        mock_db.__getitem__.return_value = mock_users_collection
+        
+        # Mock count_documents returning 0 (user not found)
+        mock_users_collection.count_documents = AsyncMock(return_value=0)
+        
+        response = client.get("/reports/999")  # Non-existent user ID
+        assert response.status_code == 404
+        assert response.json()["detail"] == "User not found"
+        
+        # Verify the database query
+        mock_users_collection.count_documents.assert_awaited_once_with({"id": 999}, limit=1)
 
 # def test_fetch_list_of_posts(mock_posts: any):
 #     '''returns list of posts and 200 success'''
