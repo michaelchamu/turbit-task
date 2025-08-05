@@ -14,6 +14,9 @@ class PyObjectId(ObjectId):
         return {"type": "string"}
 
 
+'''
+Primary comments model for creating and pulling comments
+'''
 class CommentModel(BaseModel):
     id: int = Field(..., description="JSONPlaceholder comment ID")
     postId: int = Field(..., description="ID of the related post")
@@ -21,6 +24,9 @@ class CommentModel(BaseModel):
     email: EmailStr
     body: str
 
+'''
+Pydantic model for returning page-able comments to client
+'''
 class CommentsResponseModel(BaseModel):
     comments: List[CommentModel]
     next_cursor: Optional[str] = None
