@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import List, Optional
 
 
 class Geo(BaseModel):
@@ -36,3 +36,9 @@ class UserModel(BaseModel):
         "arbitrary_types_allowed": True,
         "extra": "ignore" 
     }
+
+class UsersResponseModel(BaseModel):
+    posts: List[UserModel]
+    next_cursor: Optional[str] = None
+    has_more: bool
+    count: int
