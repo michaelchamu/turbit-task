@@ -38,7 +38,7 @@ class UserModel(BaseModel):
     }
 
 class UsersResponseModel(BaseModel):
-    posts: List[UserModel]
+    users: List[UserModel]
     next_cursor: Optional[str] = None
     has_more: bool
     count: int
