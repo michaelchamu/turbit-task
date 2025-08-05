@@ -3,6 +3,7 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 from fastapi.responses import JSONResponse
 from pymongo import ASCENDING
+import logging
 
 
 from mongoconnector import mongo_connector
@@ -11,6 +12,7 @@ from ..models.timeseries import TimeSeriesModel, AggregatedTimeSeriesModel
 #TODO setup logger instead of using print statements
 
 route = APIRouter()
+logger = logging.getLogger("task-2")
 
 #This was the initial endpoint I envisioned, just keeping for posterity
 #it simply pulled all data, unaggregated and showed timestamps etc
@@ -51,7 +53,8 @@ async def get_time_series_data(
             )
         return results
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        logger.error(str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 #data is a lot and must be cleaned and summarised (aggregated and binned) to allow creating smoother graphs
 #a simple model that returns a list with windspeed and power is used
