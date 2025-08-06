@@ -65,7 +65,7 @@ async def create_time_series_collection(db: AsyncIOMotorClient):
     try:
         existing_collections = await db.list_collection_names()
 
-        if collection_name not in existing_collections:
+        if collection_name not in existing_collections or await db[collection_name].count_documents({}) == 0:
             #create the time-series collection with the specified options
             await db.create_collection(
                 collection_name,
