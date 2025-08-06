@@ -14,7 +14,7 @@ logger = logging.getLogger("task-1")
 async def get_comments(
     cursor: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
-    comment_id: Optional[int] = Query(
+    post_id: Optional[int] = Query(
     None
     )):
     try:
@@ -28,14 +28,14 @@ async def get_comments(
         Args:
             cursor:
             limit: total number of posts to return
-            comment_id:
+            post_id: to only filter down to comments related to a specific post
         Returns:
             CommentsReturnModel: Object with a list of comments, id of next cursor etc.
         '''
         query_filter = {}
 
-        if comment_id is not None:
-            query_filter["comment_id"] = comment_id
+        if post_id is not None:
+            query_filter["postId"] = post_id
         
         if cursor:
             try:
@@ -67,6 +67,9 @@ async def get_comments(
         )
         return result
     
+    except Exception as ex: #handle all other exceptions from above gracefully, then the main ones afterwards
+        logger.error(str(ex))
+        raise
     except Exception as ex:
         logger.error(str(ex))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal error")
