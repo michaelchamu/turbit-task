@@ -18,7 +18,7 @@ from ..models.timeseries import TimeSeriesModel, TurbineMetadata
 import logging
 csv_data_path = Path(__file__).resolve().parents[3].joinpath("data/csv/")
 
-collection_name = "time-series-data"
+collection_name = "turbine_readings"
 logger = logging.getLogger("task-2")
 
 #iterate through a selected CSV file and create a TimeSeriesModel document for each row
@@ -58,37 +58,11 @@ def parse_csv_row(row: Dict[str, str], turbine_id: str) -> Dict:
             internal_temperature=internal_temperature,
             rpm=rpm
         )
-        ).model_dump()  
-
-#method to create the time-series collection if it does not exist
-async def create_time_series_collection(db: AsyncIOMotorClient):
-    try:
-        existing_collections = await db.list_collection_names()
-
-        if collection_name not in existing_collections or await db[collection_name].count_documents({}) == 0:
-            #create the time-series collection with the specified options
-            await db.create_collection(
-                collection_name,
-                timeseries={
-                    'timeField': 'timestamp',
-                    'metaField': 'metadata',
-                    'granularity': 'minutes'
-                }
-            )
-            logger.info(f"Time-series collection '{collection_name}' created successfully.")
-        else:
-            logger.info(f"Time-series collection '{collection_name}' already exists.")
-    except Exception as e:
-        logger.error(f"An error occurred while creating the time-series collection: {e}")
-        raise e
-    
+        ).model_dump() 
 
 #actual service to read CSVs then call parse_csv_row for each row and insert into MongoDB
 async def populate_time_series(db: AsyncIOMotorClient):
     try:
-        #ensure that the timeseries colection exists by calling the createtimeseries_collection method
-        await create_time_series_collection(db)
-
         #now check if the timeseries collection exists is empty
         document_count = await db[collection_name].count_documents({})
 
