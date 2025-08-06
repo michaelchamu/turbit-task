@@ -41,7 +41,7 @@ async def get_time_series_data(
         elif end_date:
             query['timestamp'] = {'$lte': end_date}
         #this adjustment allows for more flexible querying using a cursor from MongoDB
-        cursor = mongo_connector.mongodb.db['time-series-data'].find(query).sort('timestamp', ASCENDING).limit(limit)
+        cursor = mongo_connector.mongodb.db['turbine_data'].find(query).sort('timestamp', ASCENDING).limit(limit)
         results = await cursor.to_list(length=limit)
         #return with status code to make it easier client side to handle different actions
         #not adding status 200 because it will be returned in any case on success but must make distinction on 204(empty)
@@ -114,7 +114,7 @@ async def get_power_curve(
         ]
 
         results = []
-        async for doc in mongo_connector.mongodb.db['time-series-data'].aggregate(pipeline):
+        async for doc in mongo_connector.mongodb.db['turbine_data'].aggregate(pipeline):
             results.append(AggregatedTimeSeriesModel(
                 average_wind_speed=round(doc["avg_wind_speed"], 2),
                 average_power=round(doc["average_power"], 2),
@@ -137,7 +137,7 @@ async def get_list_turbines():
         '''
         use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db 
         '''
-        turbinelist = await mongo_connector.mongodb.db['time-series-data'].distinct('metadata.turbine_id')
+        turbinelist = await mongo_connector.mongodb.db['turbine_data'].distinct('metadata.turbine_id')
         #to avoid serialisation problems in tests and api calls etcexplicitly  convert result to list
         turbinelist = list(turbinelist)
 
