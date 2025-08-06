@@ -36,7 +36,7 @@ async def get_users(
 
         #do search by username case sensitive
         if username is not None:
-            query_filter["username"] = username
+            query_filter["$text"] = {"$search": username}
         
         #do search by name and surname
         if name is not None:
@@ -48,7 +48,8 @@ async def get_users(
             except Exception as ex:
                 logger.error(str(ex))
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unexpected error")
-            
+
+        #for searches with username, we use collation for better filtering and case insensitive    
         cursor_motor = mongo_connector.mongodb.db['users'].find(query_filter)
         cursor_motor = cursor_motor.sort("_id", -1).limit(limit+1)
 
