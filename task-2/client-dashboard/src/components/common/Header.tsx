@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 export default function Header() {
     return (
         <header className="bg-gray-800 text-gray-200 py-4 shadow-md">
@@ -5,9 +7,8 @@ export default function Header() {
                 <h1 className="text-xl font-bold">Wind Turbine Dashboard</h1>
                 <nav>
                     <ul className="flex space-x-4">
-                        <li><a href="#" className="hover:underline">Home</a></li>
-                        <li><a href="#" className="hover:underline">Turbines</a></li>
-                        <li><a href="#" className="hover:underline">Settings</a></li>
+                        <li><NavLink to="/" className="hover:underline">Turbines</NavLink></li>
+                        <li><NavLink to="/settings" className="hover:underline">Settings</NavLink></li>
                     </ul>
                 </nav>
             </div>
