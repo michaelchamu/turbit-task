@@ -1,7 +1,7 @@
 services:
   mongodb:
     env_file:
-      - path: ../.env
+      - ./.env
     image: mongo:7.0
     container_name: mongodb_container
     restart: always
@@ -18,7 +18,7 @@ services:
 
   mongo-express:
     env_file:
-      - path: ../.env
+      - ./.env
     image: mongo-express:1.0.2
     container_name: mongo_express_container
     restart: always
