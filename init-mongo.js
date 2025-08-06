@@ -3,6 +3,7 @@ db = db.getSiblingDB('users_data');
 
 // Create text indexes for partial text searches with case-insensitive collation
 db.createCollection('users');
+//this will make it easier to search partially by username
 db.users.createIndex({ "username": "text" });
 
 db.createCollection('posts');
