@@ -25,7 +25,7 @@ async def get_posts(
     Args:
         cursor:
         limit: total number of posts to return
-        post_id:
+        user_id:
     Returns:
         PostsReturnModel: Object with a list of posts, id of next cursor etc.
     '''
