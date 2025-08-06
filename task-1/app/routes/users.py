@@ -13,7 +13,8 @@ logger = logging.getLogger("task-2")
 async def get_users(
     cursor: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
-    post_id: Optional[int] = Query(None)
+    username: Optional[str] = Query(None),
+    name: Optional[str] = Query(None)
     ):
     try:
         '''
@@ -32,9 +33,13 @@ async def get_users(
         '''
         query_filter = {}
 
-        if post_id is not None:
-            query_filter["post_id"] = post_id
+        #do search by username case sensitive
+        if username is not None:
+            query_filter["username"] = username
         
+        #do search by name and surname
+        if name is not None:
+            query_filter["name"] = {"$regex": f".*{name}.*", "$options": "i"}
         if cursor:
             try:
                 cursor_id = ObjectId(cursor)
