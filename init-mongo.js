@@ -7,9 +7,8 @@ db.createCollection('users');
 db.users.createIndex({ "username": "text" });
 
 db.createCollection('posts');
-db.posts.createIndex({ "userId": 1 }, { unique: true });
+//these are set to false because there are identical values in some documents from the api
 db.createCollection('comments');
-db.comments.createIndex({ "postId": 1 }, { unique: true });
 
 //create time_series_data following the timeseries schema
 db = db.getSiblingDB('time_series_data');
