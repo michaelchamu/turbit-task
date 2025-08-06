@@ -13,7 +13,7 @@ logger = logging.getLogger("task-1")
 async def get_posts(
     cursor: Optional[str] = Query(None),
     limit: int = Query(20, ge=1, le=100),
-    post_id: Optional[int] = Query(None)
+    user_id: Optional[int] = Query(None)
     ):
     '''
     Fetches all posts from database.
@@ -33,8 +33,8 @@ async def get_posts(
         #setup the query filter to be used to fetch data
         query_filter = {}
 
-        if post_id is not None:
-            query_filter["post_id"] = post_id
+        if user_id is not None:
+            query_filter["userId"] = user_id
         
         #configure the cursor to be used for the base pagination
         if cursor:
