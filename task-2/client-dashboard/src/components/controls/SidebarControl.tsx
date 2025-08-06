@@ -125,6 +125,7 @@ const SidebarControl = ({ onFilterChange }: SidebarProps) => {
                     showMonthDropdown
                     showYearDropdown
                     isClearable={true}
+                    wrapperClassName="datepicker"
                     className="w-full h-[40px] border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     dateFormat="yyyy-MM-dd"
                     placeholderText="Select date range"

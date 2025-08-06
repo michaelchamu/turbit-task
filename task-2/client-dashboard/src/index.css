@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+/*set the width here because its not responding in ts*/
+.datepicker {
+    width: 100%;
+}
