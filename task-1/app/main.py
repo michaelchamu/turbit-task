@@ -2,6 +2,8 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, FastAPI #get the FastAPI and other modules from it
 from mongoconnector import mongo_connector #import the MongoDB connection functions
 import logging
+from fastapi.middleware.cors import CORSMiddleware
+
 from customlogger import customlogger
 from .services import populate_db
 from .routes import users, posts, comments, reports #import all defined routes
@@ -11,6 +13,12 @@ import os
 
 customlogger.setup_logging()
 logger = logging.getLogger("task-1")
+
+origins = ["http://localhost:3000",
+           "http://localhost:5173",
+           "http://127.0.0.1:5173",
+            os.getenv('PRODUCTION_CLIENT')
+           ]
 
 load_dotenv()
 '''
@@ -34,6 +42,14 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="UsersAPI")  # Use the lifespan context manager
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins= origins,  # React App origins
+    allow_credentials=True,
+    allow_methods=["GET"],#since we are only fetching data, allow only GET requests
+    allow_headers=["*"],
+    expose_headers=["*"],  # to allow downloading files
+)
 app.include_router(users.route)
 app.include_router(posts.route)
 app.include_router(comments.route)
