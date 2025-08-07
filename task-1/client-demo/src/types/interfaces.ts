@@ -29,7 +29,22 @@ interface Comment {
     body: string;
 }
 
-interface PostWithUser extends Post {
+export interface QueryParameters {
+    page: number;
+    limit: number;
+}
+
+export interface PostWithUser extends Post {
     user: User;
     comments: Comment[];
+}
+
+export interface UserReportInterface {
+    id: number;
+    name: string;
+    username: string;
+    posts: Post[];
+    comments: Comment[];
+    posts_count: number;
+    comments_count: number;
 }
