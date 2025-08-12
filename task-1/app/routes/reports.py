@@ -13,14 +13,14 @@ async def get_user_reports(
     page: int = Query(1, ge=1),
     limit: int = Query(50, ge=1, le=100)
 ):
-    try:
-        '''
+    '''
         Fetches list of users, their posts and comments to their posts
-        Instead of pulling all values frokm db into memory, it uses mongo pipelines
+        Instead of pulling all values frokm db into memory, it uses mongo pipelines and aggregation
         for better memory management and also handles pagination by default
 
-        sending page and limit will cause pagination from out the box
-        '''
+        sending page and limit will cause pagination out the box
+    '''
+    try:
         skip = (page - 1) * limit
 
         #setup the aggregation pipeline here
@@ -81,12 +81,11 @@ async def get_user_reports(
 #this route fetches a report for a specific user by their ID
 @route.get("/reports/{user_id}", response_model=UserReportModel)
 async def get_user_report(user_id: int):
-    try:
-
-        '''
-        Fetch user, posts, and comments from the database with a pipeline
+    '''
+        Fetch single user report which includes their posts, and comments to the posts from the database. 
         uses a pipeline again which matches the user_id parameter
-        '''
+    '''
+    try:
         #already check if user exists before we run the query
         user_exists = await mongo_connector.mongodb.db['users'].count_documents({"id": user_id}, limit=1)
         if not user_exists:
