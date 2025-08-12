@@ -24,6 +24,10 @@ fi
 echo "🛑 Stopping existing containers..."
 docker-compose down -v || true
 
+#pull from repo
+echo "Pulling fresh from GIT..."
+git pull
+
 # Remove existing images to force rebuild
 echo "Cleaning up old images..."
 docker image prune -f
