@@ -17,8 +17,7 @@ async def get_comments(
     post_id: Optional[int] = Query(
     None
     )):
-    try:
-        '''
+    '''
         Fetches all comments from database.
         To cater for potential increases in number of documents, I use a cursor
         to fetch a limited number of records.
@@ -31,7 +30,8 @@ async def get_comments(
             post_id: to only filter down to comments related to a specific post
         Returns:
             CommentsReturnModel: Object with a list of comments, id of next cursor etc.
-        '''
+    '''
+    try:
         query_filter = {}
 
         if post_id is not None:
@@ -77,11 +77,11 @@ async def get_comments(
 
 @route.get("/comments/{comment_id}", response_model=CommentModel)
 async def get_single_comment(comment_id: int):
-    try:
-        '''
+    '''
         fetches single comment from the comments collection by comment_id
         uses the comment_id from json placeholder instead of the ObjectId from mongo
-        '''
+    '''
+    try:
         comment = await mongo_connector.mongodb.db["comments"].find_one({"id": comment_id})
         if not comment:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Comment not found")
