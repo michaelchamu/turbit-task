@@ -79,10 +79,10 @@ async def get_users(
      
 @route.get("/users/{user_id}", response_model=UserModel)
 async def get_single_user(user_id: int):
+    '''
+    fetches single user by user_id
+    '''
     try:
-        '''
-        fetches single user by user_id
-        '''
         user = await mongo_connector.mongodb.db['users'].find_one({"id": user_id})
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
