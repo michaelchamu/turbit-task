@@ -16,8 +16,7 @@ async def get_users(
     username: Optional[str] = Query(None),
     name: Optional[str] = Query(None)
     ):
-    try:
-        '''
+    '''
         Fetches all users from database.
         To cater for potential increases in number of documents, I use a cursor
         to fetch a limited number of records.
@@ -31,7 +30,8 @@ async def get_users(
             name
         Returns:
             UsersReturnModel: Object with a list of users, id of next cursor etc.
-        '''
+    '''
+    try:
         query_filter = {}
 
         #do search by username case sensitive
