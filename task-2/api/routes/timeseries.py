@@ -23,10 +23,11 @@ async def get_time_series_data(
     limit: int = Query(1000, gt=0, le=10000),
 ):
     # Fetch time series data from the database
-    try:
-        '''
+    '''
         returns raw unaggregated timeseries data filterable by dates, turbine id and limit
-        '''
+        endpoint was inefficient because it doesnt use aggregation of the timeseries data but is kept for posterity
+    '''
+    try:
         query = {}
         if turbine_id:
             query['turbine_id'] = turbine_id
@@ -54,24 +55,21 @@ async def get_time_series_data(
         logger.error(str(e))
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-'''
-data is a lot and must be cleaned and summarised (aggregated and binned) to allow creating smoother graphs
-a simple model that returns a list with windspeed and power is used
-I have skipped including the date in the model, as the dates are only passed for querying
-'''
+
 @route.get("/aggregated_timeseries", response_model=List[AggregatedTimeSeriesModel])
 async def get_power_curve(
     start_date: Optional[datetime] = Query(None, description="Start date in YYYY-MM-DD"),
     end_date: Optional[datetime] = Query(None, description="End date in YYYY-MM-DD"),
     turbine_id: Optional[str] = None
 ):
-    try:
-        '''
+    '''
+        fetches the time series data with optional query parameters (start-end date, turbine id)
         by default, the start date is set to 01.01.2016 and the end date to 02.01.2016
-        default_start = datetime.strptime('01.01.2016, 00:00', '%d.%m.%Y, %H:%M')
-        default_end = datetime.strptime('02.01.2016, 00:00', '%d.%m.%Y, %H:%M')
         
-        '''
+        uses mongo data buckets (size 0.5, can be adjusted as needed), pipelines and aggregation to generate a summary grouped by windspeed
+        
+    '''
+    try:
         #check if start_date and end_date exist.
         #if dates dont exist i.e. its an API only call, set them to default values
         if not start_date or not end_date:
@@ -133,10 +131,13 @@ async def get_power_curve(
 
 @route.get("/turbines", response_model=List[str])
 async def get_list_turbines():
+    '''
+       client side needs a reliable source of turbines, 
+        so to avoid mistakes that comes with hardcoding them, extra endpoint to always pull
+         turbines from DB.
+           use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db 
+    '''
     try:
-        '''
-        use this route to always fetch a fresh batch of turbin IDs from the database so that we populate the db 
-        '''
         turbinelist = await mongo_connector.mongodb.db['turbine_readings'].distinct('metadata.turbine_id')
         #to avoid serialisation problems in tests and api calls etcexplicitly  convert result to list
         turbinelist = list(turbinelist)
